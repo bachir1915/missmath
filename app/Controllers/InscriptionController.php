@@ -55,8 +55,8 @@ class InscriptionController extends BaseController
         if ($this->userModel->insert($data)) {
             $this->generateQr($data['code_unique']);
             
-            // L'envoi de l'email se fera de manière asynchrone via AJAX depuis la page du ticket
-            // pour garantir une réponse instantanée à l'utilisateur.
+            // Envoi immédiat de l'email d'invitation
+            $this->sendInvitationEmail($data['code_unique']);
 
             if ($this->request->isAJAX()) {
                 return $this->response->setJSON([
@@ -81,78 +81,75 @@ class InscriptionController extends BaseController
     }
 
     /**
-     * Envoie l'invitation par email (Appelé via AJAX)
+     * Envoie l'invitation par email (appelé directement depuis submit)
      */
-    public function sendEmailAjax($code)
+    private function sendInvitationEmail($code)
     {
         $invite = $this->userModel->where('code_unique', $code)->first();
-        if (!$invite) return $this->response->setJSON(['status' => 'error']);
+        if (!$invite) return;
 
-        $to = $invite['email'];
+        $to   = $invite['email'];
         $name = $invite['prenom'] . ' ' . $invite['nom'];
-
-        $email = Services::email();
-        $email->setTo($to);
-        $email->setSubject('✨ Votre Invitation Officielle - Miss Maths/Miss Sciences 2026');
-        
         $link = base_url("/ticket/$code");
-        $qrPath = FCPATH . 'uploads/qrcodes/' . $code . '.png';
+        $qrPath  = FCPATH . 'uploads/qrcodes/' . $code . '.png';
         $pdfPath = FCPATH . 'uploads/tickets/ticket_' . $code . '.pdf';
 
-        // S'assurer que le dossier tickets existe
         if (!is_dir(FCPATH . 'uploads/tickets/')) {
             mkdir(FCPATH . 'uploads/tickets/', 0777, true);
         }
 
-        // 1. Gérer le QR Code pour l'email 
+        $email = \Config\Services::email();
+        $email->setTo($to);
+        $email->setSubject('✨ Votre Invitation Officielle - Miss Maths/Miss Sciences 2026');
+
+        // Attacher le QR Code
         $cid = '';
         if (file_exists($qrPath)) {
             $email->attach($qrPath);
             $cid = $email->setAttachmentCID($qrPath);
         }
 
-        // 2. Générer le PDF 
+        // Générer le PDF
         try {
             $options = new Options();
             $options->set('isRemoteEnabled', true);
             $options->set('chroot', FCPATH);
             $dompdf = new Dompdf($options);
-            
-            //  la vue en PDF
             $html = view('emails/invitation_pdf', [
-                'name' => $name,
+                'name'      => $name,
                 'telephone' => $invite['telephone'],
-                'qrPath' => $qrPath,
-                'code' => $code
+                'qrPath'    => $qrPath,
+                'code'      => $code
             ]);
-            
             $dompdf->loadHtml($html);
             $dompdf->setPaper('A4', 'portrait');
             $dompdf->render();
-            
             file_put_contents($pdfPath, $dompdf->output());
-            
-            // attach:personnalisation du nom du fichier PDF
-            $email->attach($pdfPath, 'application/pdf', "Invitation_MissMaths_2026.pdf");
+            $email->attach($pdfPath, 'application/pdf', 'Invitation_MissMaths_2026.pdf');
         } catch (\Exception $e) {
             log_message('error', 'Erreur PDF : ' . $e->getMessage());
         }
-        
-        // Template pour le message email
+
         $message = view('emails/invitation', [
             'name' => $name,
             'link' => $link,
             'cid'  => $cid
         ]);
-        
         $email->setMessage($message);
-        
-        if ($email->send()) {
-            return $this->response->setJSON(['status' => 'success']);
-        } else {
+
+        if (!$email->send()) {
             log_message('error', 'Erreur Email : ' . $email->printDebugger(['headers']));
-            return $this->response->setJSON(['status' => 'error']);
         }
+    }
+
+    /**
+     * Envoie l'invitation par email (Appelé via AJAX - gardé pour compatibilité)
+     */
+    public function sendEmailAjax($code)
+    {
+        // L'email est désormais envoyé directement lors de l'inscription.
+        // On retourne juste un succès pour ne pas casser l'animation du ticket.
+        return $this->response->setJSON(['status' => 'success']);
     }
 
     /**
@@ -182,10 +179,12 @@ class InscriptionController extends BaseController
             mkdir($path, 0777, true);
         }
 
-        // L URL contenue dans le QR Code 
-        $url = base_url("/admin/verify-scan?code=$code");
+        // URL publique de scan - accessible par TOUT appareil sans connexion
+        $url = base_url("/scan?code=$code");
 
-        $qrCode = QrCode::create($url);
+        $qrCode = QrCode::create($url)
+            ->setSize(400)
+            ->setMargin(10);
         
         $writer = new PngWriter();
         $result = $writer->write($qrCode);

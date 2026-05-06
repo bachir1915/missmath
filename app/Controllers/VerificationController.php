@@ -81,4 +81,62 @@ class VerificationController extends BaseController
         if ($isAjax) return $this->response->setJSON($data);
         return view('admin/verify_result', $data);
     }
+
+    // Scan public : accessible par n'importe quel appareil sans connexion
+    public function publicScan()
+    {
+        $code = $this->request->getVar('code');
+
+        if (empty($code)) {
+            return view('public/scan_result', [
+                'status'  => 'error',
+                'message' => 'Code QR invalide ou manquant.',
+                'invite'  => null
+            ]);
+        }
+
+        $invite = $this->userModel->where('code_unique', $code)->where('role', 'invite')->first();
+
+        if (!$invite) {
+            return view('public/scan_result', [
+                'status'  => 'error',
+                'message' => 'Ce ticket est INCONNU. Il pourrait être falsifié.',
+                'invite'  => null
+            ]);
+        }
+
+        // Si deja utilise
+        if ($invite['statut'] === 'valide') {
+            return view('public/scan_result', [
+                'status'  => 'fraud',
+                'message' => 'ALERTE : Ce ticket a déjà été utilisé le ' . date('d/m/Y à H:i', strtotime($invite['updated_at'])),
+                'invite'  => $invite
+            ]);
+        }
+
+        if ($invite['statut'] === 'annule') {
+            return view('public/scan_result', [
+                'status'  => 'error',
+                'message' => 'Cette invitation a été annulée.',
+                'invite'  => $invite
+            ]);
+        }
+
+        // Si admin connecté : valider automatiquement
+        $isAdmin = (session()->get('role') === 'admin');
+        if ($isAdmin) {
+            $this->userModel->update($invite['id'], [
+                'statut'     => 'valide',
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+            $invite['statut'] = 'valide';
+        }
+
+        return view('public/scan_result', [
+            'status'  => 'success',
+            'message' => 'Ticket VALIDE',
+            'invite'  => $invite,
+            'isAdmin' => $isAdmin
+        ]);
+    }
 }

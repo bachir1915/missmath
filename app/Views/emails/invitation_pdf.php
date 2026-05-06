@@ -136,8 +136,8 @@
             margin-bottom: 20px;
         }
         .qr-image {
-            width: 180px;
-            height: 180px;
+            width: 220px;
+            height: 220px;
         }
         .qr-instruction {
             font-size: 11px;

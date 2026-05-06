@@ -11,6 +11,9 @@ $routes->post('/register', 'InscriptionController::submit');
 $routes->get('/ticket/(:segment)', 'InscriptionController::success/$1');
 $routes->post('/ticket/(:segment)/send-email', 'InscriptionController::sendEmailAjax/$1');
 
+// Route de scan publique - accessible par n'importe quel appareil
+$routes->get('/scan', 'VerificationController::publicScan');
+
 // Authentification
 $routes->get('/login', 'AuthentificationController::index');
 $routes->post('/login', 'AuthentificationController::login');

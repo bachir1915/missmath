@@ -50,7 +50,7 @@
 
                 <!-- QR Code -->
                 <div class="d-inline-block p-4 my-4" style="background: white; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.3);">
-                    <img src="<?= base_url('uploads/qrcodes/' . $invite['qr_path']) ?>" alt="QR Code" class="img-fluid" style="width: 220px; height: 220px;">
+                    <img src="<?= base_url('uploads/qrcodes/' . $invite['qr_path']) ?>" alt="QR Code" class="img-fluid" style="width: 280px; height: 280px;">
                 </div>
 
                 <!-- Code Unique -->
