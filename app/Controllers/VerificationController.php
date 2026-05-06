@@ -134,7 +134,7 @@ class VerificationController extends BaseController
 
         return view('public/scan_result', [
             'status'  => 'success',
-            'message' => 'Ticket VALIDE',
+            'message' => 'Invitation Confirmée',
             'invite'  => $invite,
             'isAdmin' => $isAdmin
         ]);

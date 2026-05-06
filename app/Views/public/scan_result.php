@@ -17,7 +17,7 @@
                     $bgColor = 'rgba(93, 211, 158, 0.2)';
                     $textColor = '#5dd39e';
                     $icon = 'bi-check-circle-fill';
-                    $title = 'TICKET VALIDE';
+                    $title = 'ACCÈS AUTORISÉ';
                 } elseif ($status === 'fraud') {
                     $bgColor = 'rgba(255, 107, 107, 0.2)';
                     $textColor = '#ff6b6b';
