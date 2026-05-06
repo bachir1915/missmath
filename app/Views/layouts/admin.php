@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $this->renderSection('title') ?> | Miss Maths & Sciences</title>
+    <title><?= $this->renderSection('title') ?> | Miss Maths/Miss Sciences</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -346,7 +346,7 @@
             <div class="d-flex align-items-center gap-3">
                 <div class="sidebar-logo" style="font-size: 0.9rem;">MMS</div>
                 <div>
-                    <div class="sidebar-title" style="font-size: 0.9rem;">Miss Maths & Sciences</div>
+                    <div class="sidebar-title" style="font-size: 0.9rem;">Miss Maths/Miss Sciences</div>
                     <span class="sidebar-badge" style="margin-top: 2px; display: inline-block;">ADMIN 2026</span>
                 </div>
             </div>

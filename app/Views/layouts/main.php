@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $this->renderSection('title') ?> | Miss Maths - Miss Sciences 2026</title>
-    <meta name="description" content="Miss Maths - Miss Sciences 2026 - Plateforme officielle d'invitations numériques sécurisées avec QR code.">
+    <title><?= $this->renderSection('title') ?> | Miss Maths/Miss Sciences 2026</title>
+    <meta name="description" content="Miss Maths/Miss Sciences 2026 - Plateforme officielle d'invitations numériques sécurisées avec QR code.">
     
     <!-- DNS Prefetch + Preconnect pour charger les CDN plus vite -->
     <link rel="dns-prefetch" href="//cdn.jsdelivr.net">

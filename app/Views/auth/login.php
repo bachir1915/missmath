@@ -10,7 +10,7 @@
                 <i class="bi bi-shield-lock-fill text-white" style="font-size: 1.8rem;"></i>
             </div>
             <h2 class="fw-bold text-white mb-1">Accès Administration</h2>
-            <p class="brand-subtitle">Miss Maths & Sciences</p>
+            <p class="brand-subtitle">Miss Maths/Miss Sciences</p>
         </div>
 
         <div class="glass-card p-4 p-md-5">

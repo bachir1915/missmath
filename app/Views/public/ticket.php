@@ -27,7 +27,7 @@
 
             <!-- Body -->
             <div class="p-5">
-                <p class="mb-1" style="color: var(--mm-accent); font-weight: 600; letter-spacing: 4px; font-size: 0.8rem;">MISS MATHS - MISS SCIENCES 2026</p>
+                <p class="mb-1" style="color: var(--mm-accent); font-weight: 600; letter-spacing: 4px; font-size: 0.8rem;">MISS MATHS/MISS SCIENCES 2026</p>
                 
                 <div class="my-4" style="width: 60px; height: 1px; background: linear-gradient(to right, transparent, var(--mm-accent), transparent); margin: 1rem auto;"></div>
                 
@@ -50,7 +50,7 @@
 
                 <!-- QR Code -->
                 <div class="d-inline-block p-4 my-4" style="background: white; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.3);">
-                    <img src="<?= base_url('uploads/qrcodes/' . $invite['qr_path']) ?>" alt="QR Code" class="img-fluid" style="width: 180px; height: 180px;">
+                    <img src="<?= base_url('uploads/qrcodes/' . $invite['qr_path']) ?>" alt="QR Code" class="img-fluid" style="width: 220px; height: 220px;">
                 </div>
 
                 <!-- Code Unique -->

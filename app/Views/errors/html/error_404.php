@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page non trouvée | Miss Maths & Sciences</title>
+    <title>Page non trouvée | Miss Maths/Miss Sciences</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -135,7 +135,7 @@
             
             <div class="mt-5 pt-3" style="border-top: 1px solid rgba(255,255,255,0.05);">
                 <p style="color: var(--mm-text-muted); font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase;">
-                    Miss Maths & Sciences 2026
+                    Miss Maths/Miss Sciences 2026
                 </p>
             </div>
         </div>

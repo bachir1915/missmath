@@ -41,15 +41,31 @@
                     </div>
 
                     <div class="p-3 rounded-3 bg-light mb-4 text-start">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">Statut :</span>
-                            <span class="badge bg-<?= $invite['statut'] === 'utilise' ? 'danger' : ($invite['statut'] === 'en_attente' ? 'success' : 'secondary') ?>">
-                                <?= strtoupper($invite['statut']) ?>
-                            </span>
+                        <div class="row g-2 mb-2">
+                            <div class="col-6">
+                                <div class="text-muted small">Établissement</div>
+                                <div class="fw-bold small"><?= esc($invite['establishment'] ?: 'N/A') ?></div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-muted small">Classe</div>
+                                <div class="fw-bold small"><?= esc($invite['class'] ?: 'N/A') ?></div>
+                            </div>
                         </div>
-                        <div class="d-flex justify-content-between">
-                            <span class="text-muted">Code unique :</span>
-                            <span class="font-monospace small"><?= esc($invite['code_unique']) ?></span>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <div class="text-muted small">Téléphone</div>
+                                <div class="fw-bold small"><?= esc($invite['telephone']) ?></div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-muted small">Réseau Social</div>
+                                <div class="fw-bold small text-capitalize"><?= esc($invite['social_network'] ?: 'N/A') ?></div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between pt-2 border-top">
+                            <span class="text-muted small">Statut :</span>
+                            <span class="badge bg-<?= $invite['statut'] === 'valide' ? 'danger' : ($invite['statut'] === 'en_attente' ? 'success' : 'secondary') ?>">
+                                <?= strtoupper($invite['statut'] === 'valide' ? 'DÉJÀ VALIDÉ' : $invite['statut']) ?>
+                            </span>
                         </div>
                     </div>
                 <?php endif; ?>

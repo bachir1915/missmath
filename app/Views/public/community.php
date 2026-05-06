@@ -105,7 +105,7 @@
     <div class="col-lg-8 fade-in">
         <div class="text-center mb-5">
             <div class="brand-title mb-2">COMMUNAUTÉ</div>
-            <p class="brand-subtitle">Miss Maths Miss Sciences IA</p>
+            <p class="brand-subtitle">Miss Maths/Miss Sciences IA</p>
         </div>
 
         <div class="glass-card p-4 p-md-5">
@@ -253,7 +253,7 @@
 
         <div class="text-center mt-4">
             <p class="footer-text">
-                <i class="bi bi-shield-lock-fill me-1"></i> Vos données sont protégées &bull; Miss Math Miss Sciences IA 2026
+                <i class="bi bi-shield-lock-fill me-1"></i> Vos données sont protégées &bull; Miss Maths/Miss Sciences IA 2026
             </p>
         </div>
     </div>

@@ -247,7 +247,7 @@
 <div class="row justify-content-center">
     <div class="col-md-8 col-lg-6 fade-in">
         <div class="text-center mb-4">
-            <div class="brand-title mb-1" style="font-size: 1.8rem;">MISS MATHS - MISS SCIENCES</div>
+            <div class="brand-title mb-1" style="font-size: 1.8rem;">MISS MATHS/MISS SCIENCES</div>
             <p class="brand-subtitle">IA DE DAKAR &bull; Édition 2026</p>
         </div>
 
@@ -393,7 +393,7 @@
                     <div class="form-check form-switch mb-3 custom-switch-premium">
                         <input class="form-check-input" type="checkbox" id="join_community" name="join_community" value="1" checked>
                         <label class="form-check-label ms-2" for="join_community" style="color: var(--mm-text-light); font-weight: 500;">
-                            Souhaitez-vous intégrer la communauté Miss Maths Miss Sciences de l'IA de Dakar ?
+                            Souhaitez-vous intégrer la communauté Miss Maths/Miss Sciences de l'IA de Dakar ?
                         </label>
                         <div class="form-text mt-2" style="color: var(--mm-text-muted); font-size: 0.8rem; padding-left: 2.5rem;">
                             <i class="bi bi-info-circle me-1"></i> Cela permettra d'avoir l'actualité du concours et les rappels liés.
@@ -426,7 +426,7 @@
 
         <div class="text-center mt-4">
             <p class="footer-text mb-2">
-                <i class="bi bi-shield-check me-1"></i> Plateforme sécurisée &bull; &copy; 2026 Miss Maths & Sciences
+                <i class="bi bi-shield-check me-1"></i> Plateforme sécurisée &bull; &copy; 2026 Miss Maths/Miss Sciences
             </p>
             <?php if(session()->get('isLoggedIn')): ?>
                 <a href="/admin/dashboard" class="text-decoration-none" style="color: var(--mm-text-muted); font-size: 0.7rem; opacity: 0.3; transition: opacity 0.3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.3">

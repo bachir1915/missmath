@@ -136,8 +136,8 @@
             margin-bottom: 20px;
         }
         .qr-image {
-            width: 140px;
-            height: 140px;
+            width: 180px;
+            height: 180px;
         }
         .qr-instruction {
             font-size: 11px;
@@ -166,7 +166,7 @@
         <div class="invitation-card">
             <!-- Header Section -->
             <div class="header">
-                <div class="logo-title">Miss Maths & Miss Sciences</div>
+                <div class="logo-title">Miss Maths/Miss Sciences</div>
                 <div class="logo-subtitle">IA de Dakar &bull; Édition 2026</div>
             </div>
 
@@ -178,7 +178,7 @@
                 <div class="congrats-text">Félicitations <?= esc($name) ?>,</div>
                 
                 <div class="main-message">
-                    Nous sommes honorés de vous compter parmi nos invités pour la prestigieuse cérémonie de remise des prix <span class="highlight">Miss Maths - Miss Sciences 2026</span>.
+                    Nous sommes honorés de vous compter parmi nos invités pour la prestigieuse cérémonie de remise des prix <span class="highlight">Miss Maths/Miss Sciences 2026</span>.
                 </div>
                 
                 <!-- Event Details -->
@@ -218,7 +218,7 @@
         
         <div style="text-align: center; margin-top: 10mm;">
             <p style="font-size: 8px; color: #b2bec3; letter-spacing: 1px; text-transform: uppercase;">
-                Document sécurisé généré par la plateforme officielle Miss Maths Miss Sciences
+                Document sécurisé généré par la plateforme officielle Miss Maths/Miss Sciences
             </p>
         </div>
     </div>

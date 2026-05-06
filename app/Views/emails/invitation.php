@@ -3,7 +3,7 @@
         
         <!-- Premium Header -->
         <div style='background: linear-gradient(135deg, #6A0DAD 0%, #4A0896 100%); padding: 45px 30px; text-align: center; border-bottom: 6px solid #D4AF37;'>
-            <h1 style='color: #D4AF37; margin: 0; font-size: 26px; text-transform: uppercase; letter-spacing: 2px; font-weight: 900;'>Miss Maths & Miss Sciences</h1>
+            <h1 style='color: #D4AF37; margin: 0; font-size: 26px; text-transform: uppercase; letter-spacing: 2px; font-weight: 900;'>Miss Maths/Miss Sciences</h1>
             <p style='color: #ffffff; margin: 8px 0 0 0; opacity: 0.9; font-size: 15px; letter-spacing: 5px; font-weight: 300;'>IA DE DAKAR &bull; ÉDITION 2026</p>
         </div>
 
@@ -15,7 +15,7 @@
 
             <h2 style='color: #2D3436; font-size: 24px; margin-bottom: 15px; font-weight: 700;'>Félicitations <?= esc($name) ?>,</h2>
             <p style='font-size: 17px; line-height: 1.7; color: #636e72; margin-bottom: 40px;'>
-                Nous sommes honorés de vous compter parmi nos invités pour la prestigieuse cérémonie de remise des prix <strong>Miss Maths - Miss Sciences 2026</strong>.
+                Nous sommes honorés de vous compter parmi nos invités pour la prestigieuse cérémonie de remise des prix <strong>Miss Maths/Miss Sciences 2026</strong>.
             </p>
             
             <!-- Event Box -->

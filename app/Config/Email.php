@@ -7,7 +7,7 @@ use CodeIgniter\Config\BaseConfig;
 class Email extends BaseConfig
 {
     public string $fromEmail  = 'noreply@missmath.com';
-    public string $fromName   = 'Miss Math 2026';
+    public string $fromName   = 'Miss Maths/Miss Sciences 2026';
     public string $recipients = '';
 
     /**

@@ -93,7 +93,7 @@ class InscriptionController extends BaseController
 
         $email = Services::email();
         $email->setTo($to);
-        $email->setSubject('✨ Votre Invitation Officielle - Miss Maths - Miss Sciences 2026');
+        $email->setSubject('✨ Votre Invitation Officielle - Miss Maths/Miss Sciences 2026');
         
         $link = base_url("/ticket/$code");
         $qrPath = FCPATH . 'uploads/qrcodes/' . $code . '.png';
