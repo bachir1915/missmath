@@ -6,7 +6,7 @@ use CodeIgniter\Config\BaseConfig;
 
 class Email extends BaseConfig
 {
-    public string $fromEmail  = 'noreply@missmath.com';
+    public string $fromEmail  = 'bachirbousso10@gmail.com';
     public string $fromName   = 'Miss Maths/Miss Sciences 2026';
     public string $recipients = '';
 
@@ -29,40 +29,24 @@ class Email extends BaseConfig
      * SMTP Server Hostname
      */
     public string $SMTPHost = '';
-
-    /**
-     * SMTP Username
-     */
     public string $SMTPUser = '';
-
-    /**
-     * SMTP Password
-     */
     public string $SMTPPass = '';
-
-    /**
-     * SMTP Port
-     */
     public int $SMTPPort = 587;
-
-    /**
-     * SMTP Timeout (in seconds)
-     */
-    public int $SMTPTimeout = 5;
-
-    /**
-     * Enable persistent SMTP connections
-     */
+    public int $SMTPTimeout = 60;
     public bool $SMTPKeepAlive = false;
-
-    /**
-     * SMTP Encryption.
-     *
-     * @var string '', 'tls' or 'ssl'. 'tls' will issue a STARTTLS command
-     *             to the server. 'ssl' means implicit SSL. Connection on port
-     *             465 should set this to ''.
-     */
     public string $SMTPCrypto = 'tls';
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->SMTPHost = env('email.SMTPHost', 'smtp.gmail.com');
+        $this->SMTPUser = env('email.SMTPUser', 'bachirbousso10@gmail.com');
+        $this->SMTPPass = env('email.SMTPPass', 'bzew rigs ibeh inty');
+        $this->SMTPPort = (int) env('email.SMTPPort', 587);
+        $this->SMTPCrypto = env('email.SMTPCrypto', 'tls');
+        $this->fromEmail = env('email.fromEmail', 'bachirbousso10@gmail.com');
+        $this->fromName = env('email.fromName', 'Miss Math 2026');
+    }
 
     /**
      * Enable word-wrap

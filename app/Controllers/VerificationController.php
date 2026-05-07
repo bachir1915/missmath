@@ -85,13 +85,16 @@ class VerificationController extends BaseController
     // Scan public : accessible par n'importe quel appareil sans connexion
     public function publicScan()
     {
+        // On s'assure que la session est démarrée pour vérifier le rôle admin
+        $session = session();
         $code = $this->request->getVar('code');
 
         if (empty($code)) {
             return view('public/scan_result', [
                 'status'  => 'error',
                 'message' => 'Code QR invalide ou manquant.',
-                'invite'  => null
+                'invite'  => null,
+                'isAdmin' => false
             ]);
         }
 
@@ -101,7 +104,8 @@ class VerificationController extends BaseController
             return view('public/scan_result', [
                 'status'  => 'error',
                 'message' => 'Ce ticket est INCONNU. Il pourrait être falsifié.',
-                'invite'  => null
+                'invite'  => null,
+                'isAdmin' => false
             ]);
         }
 
@@ -110,7 +114,8 @@ class VerificationController extends BaseController
             return view('public/scan_result', [
                 'status'  => 'fraud',
                 'message' => 'ALERTE : Ce ticket a déjà été utilisé le ' . date('d/m/Y à H:i', strtotime($invite['updated_at'])),
-                'invite'  => $invite
+                'invite'  => $invite,
+                'isAdmin' => ($session->get('role') === 'admin')
             ]);
         }
 
@@ -118,12 +123,13 @@ class VerificationController extends BaseController
             return view('public/scan_result', [
                 'status'  => 'error',
                 'message' => 'Cette invitation a été annulée.',
-                'invite'  => $invite
+                'invite'  => $invite,
+                'isAdmin' => ($session->get('role') === 'admin')
             ]);
         }
 
         // Si admin connecté : valider automatiquement
-        $isAdmin = (session()->get('role') === 'admin');
+        $isAdmin = ($session->get('role') === 'admin');
         if ($isAdmin) {
             $this->userModel->update($invite['id'], [
                 'statut'     => 'valide',

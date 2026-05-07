@@ -170,14 +170,27 @@
         overflow-y: auto;
         padding: 8px 0;
     }
-    .select-group-label {
-        padding: 10px 16px 5px;
-        font-size: 0.65rem;
-        font-weight: 800;
-        color: var(--mm-accent);
-        text-transform: uppercase;
+    .select-option-header {
+        padding: 12px 16px;
+        background: rgba(212, 175, 55, 0.1); /* Fond doré très léger */
+        color: #D4AF37; /* Gold Classique */
+        font-size: 0.8rem;
+        font-weight: 700;
         letter-spacing: 1.5px;
-        opacity: 0.8;
+        text-transform: uppercase;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        cursor: default;
+        display: flex;
+        align-items: center;
+    }
+    .select-option-header::before {
+        content: "";
+        display: inline-block;
+        width: 4px;
+        height: 14px;
+        background: #D4AF37;
+        margin-right: 10px;
+        border-radius: 2px;
     }
     .select-option {
         padding: 12px 16px;
@@ -196,6 +209,42 @@
         background: rgba(106, 13, 173, 0.15);
         color: var(--mm-accent);
         font-weight: 600;
+    }
+    
+    .quota-badge {
+        font-size: 0.65rem;
+        padding: 2px 8px;
+        border-radius: 20px;
+        margin-left: auto;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .quota-badge.available {
+        background: rgba(46, 204, 113, 0.1);
+        color: #2ecc71;
+        border: 1px solid rgba(46, 204, 113, 0.2);
+    }
+    .quota-badge.warning {
+        background: rgba(230, 126, 34, 0.1);
+        color: #e67e22;
+        border: 1px solid rgba(230, 126, 34, 0.2);
+        animation: pulse-orange 2s infinite;
+    }
+    @keyframes pulse-orange {
+        0% { box-shadow: 0 0 0 0 rgba(230, 126, 34, 0.4); }
+        70% { box-shadow: 0 0 0 6px rgba(230, 126, 34, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(230, 126, 34, 0); }
+    }
+    .quota-badge.full {
+        background: rgba(231, 76, 60, 0.1);
+        color: #e74c3c;
+        border: 1px solid rgba(231, 76, 60, 0.2);
+        text-decoration: line-through;
+    }
+    .select-option.full {
+        opacity: 0.6;
+        cursor: not-allowed;
     }
     .no-results {
         padding: 20px;
@@ -226,6 +275,15 @@
         padding-top: 4px;
         cursor: pointer;
     }
+    .btn-gold:disabled {
+        background: #4a4a4a !important;
+        border-color: #555 !important;
+        color: #888 !important;
+        cursor: not-allowed;
+        transform: none !important;
+        box-shadow: none !important;
+        opacity: 0.6;
+    }
 </style>
 <?= $this->endSection() ?>
 
@@ -240,7 +298,7 @@
             <i class="bi bi-check-circle-fill" style="font-size: 5rem; color: #5dd39e; filter: drop-shadow(0 0 20px rgba(93, 211, 158, 0.4));"></i>
         </div>
         <div class="brand-title mb-2" style="font-size: 1.5rem; background: linear-gradient(135deg, #5dd39e, #a29bfe); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">TERMINÉ !</div>
-        <p class="text-white opacity-75" style="letter-spacing: 2px; font-size: 0.8rem;">VOTRE INVITATION EST PRÊTE.</p>
+        <p class="text-white opacity-75" style="letter-spacing: 2px; font-size: 0.8rem;">VOTRE INVITATION A ÉTÉ ENVOYÉE PAR EMAIL.</p>
     </div>
 </div>
 
@@ -326,22 +384,31 @@
                     <div class="row g-3 mb-4">
                         <div class="col-md-7">
                             <label class="form-label" id="label-establishment">Établissement</label>
-                            <div class="custom-select-container">
+                            
+                            <!-- Dropdown pour Lycée/CEM (Groupé par IEF) -->
+                            <div class="custom-select-container" id="establishment-select-wrapper">
                                 <div class="select-trigger" id="establishment-trigger">
                                     <span id="selected-establishment-text">Choisir un établissement...</span>
                                     <i class="bi bi-chevron-down"></i>
                                 </div>
                                 <div class="select-dropdown" id="establishment-dropdown">
                                     <div class="select-search-wrapper">
-                                        <input type="text" class="select-search" id="establishment-search" placeholder="Rechercher un établissement..." autocomplete="off">
+                                        <input type="text" class="select-search" id="establishment-search" placeholder="Rechercher..." autocomplete="off">
                                     </div>
                                     <div class="select-options" id="establishment-options">
-                                        <!-- Options peuplées par JS -->
+                                        <!-- Options peuplées par JS (Groupées par IEF) -->
                                     </div>
                                     <div class="no-results" id="establishment-no-results">Aucun résultat trouvé</div>
                                 </div>
-                                <input type="hidden" name="establishment" id="establishment-hidden-input">
                             </div>
+
+                            <!-- Input libre pour Privé -->
+                            <div id="establishment-input-wrapper" style="display: none;">
+                                <input type="text" id="establishment-manual" class="form-control" placeholder="Saisissez le nom de votre établissement">
+                            </div>
+
+                            <input type="hidden" name="establishment" id="establishment-hidden-input">
+
                         </div>
                         <div class="col-md-5">
                             <label class="form-label">Classe</label>
@@ -371,15 +438,18 @@
                     <div class="form-subtitle">Profil Communauté</div>
                     <div class="mb-3">
                         <label class="form-label" style="text-transform: none; font-size: 0.95rem; color: var(--mm-accent);">Quel est votre intérêt pour le concours&nbsp;?</label>
-                        <select name="interest" class="form-select">
-                            <option value="" selected disabled>Choisir...</option>
-                            <option value="Je suis professeur">Je suis professeur</option>
-                            <option value="Je suis chef d'établissement">Je suis chef d'établissement</option>
-                            <option value="Je suis encadreur">Je suis encadreur</option>
-                            <option value="Je suis parent d'une lauréate">Je suis parent d'une lauréate</option>
-                            <option value="Je suis dans l'école d'une lauréate ou candidate">Je suis dans l'école d'une lauréate ou d'une candidate</option>
-                            <option value="Autre">Autre</option>
-                        </select>
+                        <div class="custom-select-container" id="interest-container">
+                            <div class="select-trigger" id="interest-trigger">
+                                <span id="selected-interest-text">Choisir votre intérêt...</span>
+                                <i class="bi bi-chevron-down"></i>
+                            </div>
+                            <div class="select-dropdown" id="interest-dropdown">
+                                <div class="select-options" id="interest-options">
+                                    <!-- Les options seront générées ici -->
+                                </div>
+                            </div>
+                            <input type="hidden" name="interest" id="interest-hidden-input">
+                        </div>
                     </div>
                     <div class="mb-4">
                         <label class="form-label">Profession</label>
@@ -446,6 +516,7 @@
 <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.10/build/js/intlTelInput.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        let isQuotaFull = false;
         const phoneInput = document.querySelector("#phone");
         const phoneFull = document.querySelector("#phone_full");
         const iti = window.intlTelInput(phoneInput, {
@@ -461,135 +532,77 @@
         const sectionSocial = document.querySelector('#section-social');
         const labelEstablishment = document.querySelector('#label-establishment');
 
-        // ── Data: Établissements ──
-        const establishmentsData = {
-            lycee: [
-                { name: "BST LIBERTE 3" },
-                { name: "BST POINT E" },
-                { name: "INSTITUT ISLAMIQUE DE DAKAR" },
-                { name: "LEP BIRAGO DIOP" },
-                { name: "LYCEE AMATH DANSOKHO" },
-                { name: "LYCEE AMINATA SOW FALL" },
-                { name: "LYCEE BLAISE DIAGNE" },
-                { name: "LYCEE DE HANN BEL AIR" },
-                { name: "LYCEE D’EXCELLENCE MARIAMA BA" },
-                { name: "LYCEE FRANCO ARABE CHEIKH MOUHAMADOU FADILOU MBACKE" },
-                { name: "LYCEE GALANDOU DIOUF" },
-                { name: "LYCÉE JOHN FITZGERARLD KENNEDY" },
-                { name: "LYCEE JOHN FITZGERALD KENNEDY" },
-                { name: "LYCEE LAMINE GUEYE" },
-                { name: "LYCEE MIXTE MAURICE DELAFOSSE" },
-                { name: "LYCEE OUSMANE SEMBENE" },
-                { name: "LYCEE PARCELLES ASSAINIES UINTE 13" },
-                { name: "LYCEE SERGENT MALAMINE CAMARA" },
-                { name: "LYCEE TALIBOU DABO" },
-                { name: "LYCEE THIERNO SAIDOU NOUROU TALL" },
-                { name: "LYCEE THIERNO SAÏDOU NOUROU TALL" },
-                { name: "Autre établissement..." }
-            ],
-            cem: [
-                { name: "ABBE ARSEN FRIDOIL" },
-                { name: "ABBE PIERRE SOCK( ADAMA NDIAYE)" },
-                { name: "ABDOULAYE MATHURIN DIOP" },
-                { name: "BLAISE DIAGNE" },
-                { name: "CEM ADAMA DIALLO" },
-                { name: "CEM ADAMA NDIAYE" },
-                { name: "CEM ALIOUNE DIOP" },
-                { name: "CEM AMADOU TRAWARE" },
-                { name: "CEM Amadou TRAWARE" },
-                { name: "CEM BADARA MBAYE KABA" },
-                { name: "CEM CAMBERENE" },
-                { name: "CEM CHEIKH AWA BALLA MBACKE" },
-                { name: "CEM DAVID DIOP" },
-                { name: "CEM DOCTEUR SAMBA GUEYE" },
-                { name: "CEM DR SAMBA GUEYE" },
-                { name: "CEM EL HADJI IBRAHIMA THIAW" },
-                { name: "CEM EL HADJI MAMADOU NDIAYE" },
-                { name: "CEM ELH MANSOUR SY MALICK" },
-                { name: "CEM GRAND YOFF" },
-                { name: "CEM HANN MARISTES" },
-                { name: "CEM HLM GRAND YOFF" },
-                { name: "CEM HLM4C" },
-                { name: "CEM IBRAHIMA THIAW" },
-                { name: "CEM LIBERTE 6/C" },
-                { name: "CEM MAME THIERNO BIRAHIM MBACKE" },
-                { name: "CEM MANGUIERS" },
-                { name: "CEM NGOR" },
-                { name: "CEM OUAKAM 2" },
-                { name: "CEM OUSMANE SOCE DIOP DE DIEUPPEUL" },
-                { name: "CEM PA 18" },
-                { name: "CEM PA U 20" },
-                { name: "CEM PA UNITE 20" },
-                { name: "CEM SCAT URBAM" },
-                { name: "CEM SEYDINA ISSA LAYE" },
-                { name: "CEM UNITE 19" },
-                { name: "CEM YOFF" },
-                { name: "CEMAD" },
-                { name: "EL HADJI MALICK SY" },
-                { name: "EL HADJI OUSMANE DIOP COUMBA PATHÉ" },
-                { name: "JOHN FITZGERALD KENNEDY" },
-                { name: "MANGUIERS" },
-                { name: "MARTIN LUTHER KING" },
-                { name: "SERIGNE AHMET SY MALICK" },
-                { name: "Autre établissement..." }
-            ],
-            groupe_prive: [
-                { name: "AL ALIM" },
-                { name: "CARDINAL HYACINTHE THIANDOUM" },
-                { name: "CATHEDRALE" },
-                { name: "COLLEGE 3e MILLENAIRE" },
-                { name: "COLLEGE EBOA" },
-                { name: "COLLEGE NOTRE DAME DU LIBAN" },
-                { name: "COLLEGE SAINT PIERRE" },
-                { name: "COMPLEXE DAKAR EDU" },
-                { name: "COSMOFALIM" },
-                { name: "COURS PRIVES ATHENA SEDAR" },
-                { name: "COURS PRIVES LES ERUDITS" },
-                { name: "COURS PRIVES MAME ABDOU DABAKH" },
-                { name: "COURS SACRE-CŒUR" },
-                { name: "COURS SAINTE MARIE DE HANN" },
-                { name: "CP ABOUL ABASS" },
-                { name: "CP EL HADJI IBRAHIMA NIASS" },
-                { name: "CP JOHN WESLEY" },
-                { name: "CP KHALIFA KEBA SYLLA" },
-                { name: "CP LES INNOVATEURS" },
-                { name: "CP LES PEDAGOGUES" },
-                { name: "CP MERE JEAN LOUIS DIENG" },
-                { name: "CP MIKADO" },
-                { name: "CP RASSOUL SCHOOL" },
-                { name: "CP REINE FABIOLA" },
-                { name: "CP. SAINT-MAURICE" },
-                { name: "Cours Privés d'Excellence Ibnata Imran" },
-                { name: "ECOLE PRIVEE MAARIF SACRE CŒUR" },
-                { name: "ENSUP AFRIQUE/BERKELEY" },
-                { name: "EP CHEIKH OMAR TALL NAFOORE" },
-                { name: "EP KHADIMOU RASSOUL" },
-                { name: "EP REINE FABIOLA" },
-                { name: "ESIEX" },
-                { name: "GROUPE SCOLAIRE VICTORIA EXCELLENCE" },
-                { name: "GS D'EXCELLENCE SENEQUE" },
-                { name: "GS LE REFUGE DES PETITS" },
-                { name: "GS MAME NAFISSA" },
-                { name: "GS SALDIA" },
-                { name: "GSPNFSYLLA" },
-                { name: "Groupe Scolaire Les Petits PAS" },
-                { name: "HALWAR GROUPE SCOLAIRE" },
-                { name: "INSTITUT MODERNE DES MARISTES" },
-                { name: "INSTITUTION IMMACULEE CONCEPTION DE DAKAR" },
-                { name: "INSTITUTION MONTESSORI ATLANTIQUE" },
-                { name: "INSTITUTION NOTRE DAME" },
-                { name: "INTEGRAL INTERNATIONAL SCHOOL" },
-                { name: "Institution Privée Marc Perrot" },
-                { name: "KEUR ARAME" },
-                { name: "LE PROTESTANT" },
-                { name: "LEMBA" },
-                { name: "MAISON D'EDUCATION ATHENA" },
-                { name: "MAISON DE LA SAGESSE" },
-                { name: "MARTIN LUTHER KING (Privé)" },
-                { name: "MIKADO" },
-                { name: "Autre établissement..." }
-            ]
+        // ── Data: Cache des établissements ──
+        let establishmentsCache = {
+            cem: [],
+            lycee: [],
+            groupe_prive: []
         };
+
+        async function fetchEstablishments(type) {
+            if (type === 'groupe_prive' || type === 'communaute') return;
+            
+            // Si déjà en cache, on peut optionnellement rafraîchir ou utiliser le cache
+            // Pour être "temps réel", on rafraîchit à chaque clic sur le sélecteur ou changement de catégorie
+            try {
+                const response = await fetch(`/get-establishments?type=${type}`, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                const data = await response.json();
+                
+                // Transformer les données pour inclure les headers de zone (IEF)
+                const formatted = [];
+                let currentIef = null;
+                
+                data.forEach(est => {
+                    if (est.ief !== currentIef) {
+                        currentIef = est.ief;
+                        formatted.push({ type: 'zone', name: `IEF : ${currentIef}` });
+                    }
+                    formatted.push(est);
+                });
+                
+                establishmentsCache[type] = formatted;
+                populateOptions(type);
+            } catch (e) {
+                console.error("Erreur chargement établissements:", e);
+                optionsContainer.innerHTML = '<div class="p-3 text-center text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Erreur de chargement</div>';
+            }
+        }
+
+        const estSelectWrapper = document.querySelector('#establishment-select-wrapper');
+        const estInputWrapper = document.querySelector('#establishment-input-wrapper');
+        const estManualInput = document.querySelector('#establishment-manual');
+
+        // Fonction de vérification des quotas via AJAX
+        let quotaTimeout;
+        async function checkQuota(establishmentName) {
+            if (!establishmentName || establishmentName.length < 2) {
+                isQuotaFull = false;
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('establishment', establishmentName);
+
+            try {
+                const response = await fetch('/check-quota', {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                const res = await response.json();
+
+                if (res.status === 'success') {
+                    if (res.remaining !== null && res.remaining <= 0) {
+                        isQuotaFull = true;
+                    } else {
+                        isQuotaFull = false;
+                    }
+                    validateForm(); 
+                }
+            } catch (e) { console.error("Erreur quota:", e); }
+        }
 
         const trigger = document.querySelector('#establishment-trigger');
         const dropdown = document.querySelector('#establishment-dropdown');
@@ -601,14 +614,14 @@
         const otherWrapper = document.querySelector('#other-establishment-wrapper');
 
         function populateOptions(category, filter = '') {
-            const list = establishmentsData[category] || [];
+            const list = establishmentsCache[category] || [];
             optionsContainer.innerHTML = '';
             
             const filtered = list.filter(item => 
                 item.name.toLowerCase().includes(filter.toLowerCase())
             );
 
-            if (filtered.length === 0) {
+            if (filtered.length === 0 && filter !== '') {
                 noResults.style.display = 'block';
                 return;
             }
@@ -616,26 +629,53 @@
 
             filtered.forEach(item => {
                 const option = document.createElement('div');
-                option.className = 'select-option';
-                if (hiddenInput.value === item.name) option.classList.add('selected');
-                option.innerHTML = `<span>${item.name}</span>`;
                 
-                option.addEventListener('click', () => {
-                    hiddenInput.value = item.name;
-                    selectedText.textContent = item.name;
-                    selectedText.style.color = 'white';
-                    
-                    // Toggle other field
-                    if (item.name === 'Autre établissement...') {
-                        otherWrapper.style.display = 'block';
-                        otherWrapper.querySelector('input').focus();
-                    } else {
-                        otherWrapper.style.display = 'none';
-                    }
+                if (item.type === 'zone') {
+                    option.className = 'select-option-header';
+                    option.innerHTML = `<strong>${item.name}</strong>`;
+                    optionsContainer.appendChild(option);
+                    return;
+                }
 
-                    closeDropdown();
-                    updateClasses(category);
-                });
+                const isFull = item.remaining !== null && item.remaining <= 0;
+                option.className = `select-option ${isFull ? 'full' : ''}`;
+                
+                if (hiddenInput.value === item.name) option.classList.add('selected');
+                
+                let quotaBadge = '';
+                if (item.remaining !== null) {
+                    let badgeClass = 'available';
+                    let text = `${item.remaining} places`;
+                    
+                    if (item.remaining <= 0) {
+                        badgeClass = 'full';
+                        text = 'Complet';
+                    } else if (item.remaining <= 2) {
+                        badgeClass = 'warning';
+                        text = `${item.remaining} places`;
+                    }
+                    
+                    quotaBadge = `<span class="quota-badge ${badgeClass}">${text}</span>`;
+                }
+
+                option.innerHTML = `<span>${item.name}</span> ${quotaBadge}`;
+                
+                if (!isFull) {
+                    option.addEventListener('click', () => {
+                        hiddenInput.value = item.name;
+                        selectedText.textContent = item.name;
+                        selectedText.style.color = 'white';
+                        
+                        closeDropdown();
+                        checkQuota(item.name); // Vérifier le quota précisément (sécurité)
+                        validateForm();
+                    });
+                } else {
+                    option.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        // Optionnel : un petit message ou secousse pour indiquer que c'est complet
+                    });
+                }
 
                 optionsContainer.appendChild(option);
             });
@@ -651,6 +691,12 @@
             dropdown.style.display = 'flex';
             trigger.classList.add('active');
             searchInput.focus();
+            
+            // Rafraîchir les données à chaque ouverture pour le "temps réel"
+            const currentCat = selectedTypeInput.value;
+            if (currentCat === 'cem' || currentCat === 'lycee') {
+                fetchEstablishments(currentCat);
+            }
         }
 
         function closeDropdown() {
@@ -668,10 +714,18 @@
             socialTrigger.classList.remove('active');
         }
 
+        function closeInterestDropdown() {
+            if (interestDropdown) {
+                interestDropdown.style.display = 'none';
+                interestTrigger.classList.remove('active');
+            }
+        }
+
         document.addEventListener('click', () => {
             closeDropdown();
             closeClassDropdown();
             closeSocialDropdown();
+            closeInterestDropdown();
         });
 
         trigger.addEventListener('click', (e) => {
@@ -808,6 +862,58 @@
         });
 
         populateSocialOptions(); // Initial population
+        
+        // ── Logic for Interest Select ──
+        const interestTrigger = document.querySelector('#interest-trigger');
+        const interestDropdown = document.querySelector('#interest-dropdown');
+        const interestOptionsContainer = document.querySelector('#interest-options');
+        const interestHiddenInput = document.querySelector('#interest-hidden-input');
+        const selectedInterestText = document.querySelector('#selected-interest-text');
+
+        const interestsData = [
+            "Je suis professeur",
+            "Je suis chef d'établissement",
+            "Je suis encadreur",
+            "Je suis parent d'une lauréate",
+            "Je suis dans l'école d'une lauréate ou candidate",
+            "Autre"
+        ];
+
+        function populateInterestOptions() {
+            interestOptionsContainer.innerHTML = '';
+            interestsData.forEach(item => {
+                const option = document.createElement('div');
+                option.className = 'select-option';
+                if (interestHiddenInput.value === item) option.classList.add('selected');
+                option.innerHTML = `<span>${item}</span>`;
+                
+                option.addEventListener('click', () => {
+                    interestHiddenInput.value = item;
+                    selectedInterestText.textContent = item;
+                    selectedInterestText.style.color = 'white';
+                    interestDropdown.style.display = 'none';
+                    interestTrigger.classList.remove('active');
+                    validateForm();
+                });
+                interestOptionsContainer.appendChild(option);
+            });
+        }
+
+        interestTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = interestDropdown.style.display === 'flex';
+            closeDropdown();
+            closeClassDropdown();
+            if (isOpen) {
+                interestDropdown.style.display = 'none';
+                interestTrigger.classList.remove('active');
+            } else {
+                interestDropdown.style.display = 'flex';
+                interestTrigger.classList.add('active');
+            }
+        });
+
+        populateInterestOptions();
 
         function updateClasses(category) {
             classHiddenInput.value = '';
@@ -816,12 +922,40 @@
             populateClassOptions(category);
         }
 
+        // Écouteur pour la saisie manuelle des privés
+        estManualInput.addEventListener('input', function() {
+            const val = this.value.trim();
+            hiddenInput.value = val;
+            
+            // Délai pour ne pas saturer le serveur de requêtes AJAX
+            clearTimeout(quotaTimeout);
+            quotaTimeout = setTimeout(() => {
+                checkQuota(val);
+                validateForm();
+            }, 500);
+        });
+
         function filterSelects(category) {
             hiddenInput.value = '';
             selectedText.textContent = 'Choisir un établissement...';
             selectedText.style.color = 'var(--mm-text-muted)';
-            otherWrapper.style.display = 'none';
-            populateOptions(category);
+            
+            // Reset status lors du changement de catégorie
+            isQuotaFull = false;
+
+            if (category === 'groupe_prive') {
+                estSelectWrapper.style.display = 'none';
+                estInputWrapper.style.display = 'block';
+                estManualInput.value = '';
+            } else {
+                estSelectWrapper.style.display = 'block';
+                estInputWrapper.style.display = 'none';
+                
+                // UX: Afficher un loader dans le dropdown pendant le fetch
+                optionsContainer.innerHTML = '<div class="p-3 text-center text-muted"><span class="spinner-border spinner-border-sm me-2"></span>Chargement...</div>';
+                
+                fetchEstablishments(category); // Fetch dynamically
+            }
             updateClasses(category);
         }
 
@@ -849,10 +983,11 @@
                     
                     if (cat === 'cem') labelEstablishment.innerText = 'CEM';
                     else if (cat === 'lycee') labelEstablishment.innerText = 'Lycée';
-                    else labelEstablishment.innerText = 'Groupe Scolaire';
+                    else labelEstablishment.innerText = 'Établissement Privé';
                     
                     filterSelects(cat);
                 }
+                validateForm();
             });
         });
 
@@ -878,34 +1013,86 @@
 
         const form = document.querySelector('#form-register');
         const loader = document.querySelector('#loader-overlay');
+        const submitBtn = form.querySelector('button[type="submit"]');
+
+        // Initialisation : bouton désactivé
+        submitBtn.disabled = true;
+
+        function validateForm() {
+            const currentType = selectedTypeInput.value;
+            const prenom = form.querySelector('[name="prenom"]').value.trim();
+            const nom = form.querySelector('[name="nom"]').value.trim();
+            const email = form.querySelector('[name="email"]').value.trim();
+            const phone = phoneInput.value.trim();
+            
+            // Regex Email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            let isValid = true;
+
+            // Champs de base
+            if (!prenom || !nom || !emailRegex.test(email)) isValid = false;
+            
+            // Téléphone (via iti)
+            if (!iti.isValidNumber()) isValid = false;
+
+            // Champs dynamiques
+            if (currentType !== 'communaute') {
+                if (!hiddenInput.value) isValid = false; // Etablissement
+                if (!classHiddenInput.value) isValid = false; // Classe
+            } else {
+                const interest = interestHiddenInput.value;
+                const profession = form.querySelector('[name="profession"]').value.trim();
+                if (!interest || !profession) isValid = false;
+            }
+
+            // Réseau social si coché
+            if (joinCommunityCheckbox.checked && !socialHiddenInput.value) {
+                isValid = false;
+            }
+
+            // Bloquer si le quota est atteint
+            if (isQuotaFull) {
+                isValid = false;
+            }
+
+            submitBtn.disabled = !isValid;
+        }
+
+        // Écouteurs sur tous les champs pour la validation en temps réel
+        form.querySelectorAll('input, select').forEach(el => {
+            el.addEventListener('input', validateForm);
+            el.addEventListener('change', validateForm);
+        });
+        
+        // Écouteurs spécifiques pour intl-tel-input
+        phoneInput.addEventListener('keyup', validateForm);
+        phoneInput.addEventListener('change', validateForm);
+        phoneInput.addEventListener('countrychange', validateForm);
+
+        // Puisqu'on utilise des selects custom, on appelle validateForm quand ils changent
+        const originalHiddenInputSet = hiddenInput.setAttribute;
+        hiddenInput.addEventListener('change', validateForm);
+        classHiddenInput.addEventListener('change', validateForm);
+        socialHiddenInput.addEventListener('change', validateForm);
+
+        // Petit Hack pour détecter le changement des inputs hidden (custom selects)
+        const observer = new MutationObserver(validateForm);
+        [hiddenInput, classHiddenInput, socialHiddenInput, selectedTypeInput].forEach(el => {
+            observer.observe(el, { attributes: true, attributeFilter: ['value'] });
+        });
 
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
+            
+            if (submitBtn.disabled) return;
+            
             const currentType = selectedTypeInput.value;
             
-            // Validation manuelle de la classe si on n'est pas en mode communauté
-            if (currentType !== 'communaute' && !classHiddenInput.value) {
-                loader.style.display = 'none';
-                const errorContainer = document.querySelector('#error-container');
-                const errorList = document.querySelector('#error-list');
-                errorList.innerHTML = '<li><i class="bi bi-exclamation-circle me-2"></i>Veuillez sélectionner votre classe.</li>';
-                errorContainer.style.display = 'block';
-                errorContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                return;
-            }
-
-            // Validation manuelle de l'établissement si on n'est pas en mode communauté
-            if (currentType !== 'communaute' && !hiddenInput.value) {
-                loader.style.display = 'none';
-                const errorContainer = document.querySelector('#error-container');
-                const errorList = document.querySelector('#error-list');
-                errorList.innerHTML = '<li><i class="bi bi-exclamation-circle me-2"></i>Veuillez sélectionner un établissement dans la liste.</li>';
-                errorContainer.style.display = 'block';
-                errorContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                return;
-            }
-
-            // Collecte des données
+            // Désactivation immédiate du bouton pour éviter les doubles clics
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Génération en cours...';
+            
             // Capture du numéro au format international
             try {
                 phoneFull.value = iti.getNumber();
@@ -915,9 +1102,9 @@
             }
             const formData = new FormData(this);
             
-            // Affichage du loader premium
+            // Affichage du loader premium avec effet de flou
             loader.style.display = 'flex';
-            loader.style.opacity = '1';
+            setTimeout(() => { loader.style.opacity = '1'; }, 10);
 
             try {
                 const response = await fetch('/register', {
@@ -931,18 +1118,24 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    // Affichage du succès
+                    // Note : L'email est envoyé de manière synchrone par le serveur pour plus de fiabilité.
+                    // Les optimisations (cache PDF, SMTP rapide) garantissent un temps de réponse réduit.
+
+                    // Affichage de l'animation de succès (Expert UX)
                     document.querySelector('#loader-working').style.display = 'none';
                     document.querySelector('#loader-success').style.display = 'block';
                     
-                    // Redirection vers le ticket
+                    // On laisse l'utilisateur voir le succès avant de rediriger
                     setTimeout(() => {
                         window.location.href = result.redirect || '/';
-                    }, 800);
+                    }, 1500);
                 } else {
+                    // Réactivation du bouton en cas d'erreur
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="bi bi-qr-code-scan me-2"></i>Récupérer mon invitation';
                     loader.style.display = 'none';
                     
-                    // Affichage des erreurs proprement
+                    // Affichage des erreurs
                     const errorContainer = document.querySelector('#error-container');
                     const errorList = document.querySelector('#error-list');
                     errorList.innerHTML = '';
@@ -960,6 +1153,8 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="bi bi-qr-code-scan me-2"></i>Récupérer mon invitation';
                 loader.style.display = 'none';
                 alert("Erreur de communication avec le serveur. Veuillez vérifier votre connexion.");
             }

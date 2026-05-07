@@ -27,7 +27,7 @@
                 <td style="text-align:center;"><?= esc($invite['class']) ?></td>
                 <td><?= esc($invite['profession']) ?></td>
                 <td><?= esc($invite['email']) ?></td>
-                <td><?= esc($invite['telephone']) ?></td>
+                <td><?= format_phone_number($invite['telephone']) ?></td>
                 <td><?= esc($invite['interest']) ?></td>
                 <td><?= esc($invite['social_network']) ?></td>
                 

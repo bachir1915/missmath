@@ -75,7 +75,8 @@
             position: absolute;
             font-size: 1.5rem;
             color: rgba(106, 13, 173, 0.12);
-            animation: floatSymbol 20s infinite linear;
+            animation: floatSymbol 25s infinite linear;
+            will-change: transform;
         }
         .math-bg span:nth-child(1) { left: 5%; animation-delay: 0s; font-size: 2rem; }
         .math-bg span:nth-child(2) { left: 15%; animation-delay: 3s; }
@@ -96,8 +97,8 @@
         /* ── Glassmorphism Card ── */
         .glass-card {
             background: var(--mm-glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--mm-glass-border);
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);

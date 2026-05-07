@@ -9,6 +9,7 @@ class InviteController extends ResourceController
 {
     protected $modelName = UserModel::class;
     protected $format    = 'html';
+    protected $helpers   = ['phone'];
 
     /**
      * Return an array of resource objects, themselves in array format

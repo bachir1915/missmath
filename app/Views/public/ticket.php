@@ -1,207 +1,582 @@
 <?= $this->extend('layouts/main') ?>
 
-<?= $this->section('title') ?>Votre Invitation<?= $this->endSection() ?>
+<?= $this->section('title') ?>Votre Invitation VIP - Miss Maths 2026<?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<div class="row justify-content-center">
-    <div class="col-md-5 col-lg-4 fade-in">
-        <div class="text-center mb-4">
-            <?php if (session()->getFlashdata('success')): ?>
-                <div class="alert alert-success border-0 shadow-sm mb-4" style="background: rgba(40, 167, 69, 0.2); color: #fff; border-radius: 12px;">
-                    <i class="bi bi-check-circle-fill me-2"></i>
-                    <?= session()->getFlashdata('success') ?>
-                </div>
-            <?php endif; ?>
-
-            <span class="badge rounded-pill px-4 py-2 mb-3" style="background: rgba(212, 175, 55, 0.15); color: var(--mm-accent); font-size: 0.8rem; letter-spacing: 2px; font-weight: 600;">
-                <i class="bi bi-star-fill me-1"></i> INVITATION VIP
-            </span>
-        </div>
-
-        <div class="glass-card text-center overflow-hidden" style="border: 1px solid rgba(212, 175, 55, 0.2);">
-            <!-- Header doré -->
-            <div class="py-4 px-3 position-relative" style="background: linear-gradient(135deg, var(--mm-primary) 0%, rgba(212, 175, 55, 0.4) 100%);">
-                <div class="position-absolute top-0 start-0 w-100 h-100" style="background: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%2250%22 x=%2210%22 font-size=%2220%22 fill=%22rgba(255,255,255,0.05)%22>∑ π ∞ Δ</text></svg>') repeat; opacity: 0.5;"></div>
-                <h4 class="mb-0 fw-bold text-white position-relative" style="letter-spacing: 3px;">INVITATION OFFICIELLE</h4>
-            </div>
-
-            <!-- Body -->
-            <div class="p-5">
-                <p class="mb-1" style="color: var(--mm-accent); font-weight: 600; letter-spacing: 4px; font-size: 0.8rem;">MISS MATHS/MISS SCIENCES 2026</p>
-                
-                <div class="my-4" style="width: 60px; height: 1px; background: linear-gradient(to right, transparent, var(--mm-accent), transparent); margin: 1rem auto;"></div>
-                
-                <h2 class="fw-bold text-white mb-1"><?= esc($invite['prenom']) ?> <?= esc($invite['nom']) ?></h2>
-                <p style="color: var(--mm-text-muted);"><?= esc($invite['email']) ?></p>
-
-                <!-- Event Details -->
-                <div class="mt-4 p-3" style="background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
-                    <div class="row g-0">
-                        <div class="col-6 border-end border-white border-opacity-10">
-                            <div style="font-size: 0.65rem; color: var(--mm-accent); text-transform: uppercase; letter-spacing: 1px;">Date</div>
-                            <div class="text-white fw-bold">13 Mai 2026</div>
-                        </div>
-                        <div class="col-6">
-                            <div style="font-size: 0.65rem; color: var(--mm-accent); text-transform: uppercase; letter-spacing: 1px;">Lieu</div>
-                            <div class="text-white fw-bold">Sorano</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- QR Code -->
-                <div class="d-inline-block p-4 my-4" style="background: white; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.3);">
-                    <img src="<?= base_url('uploads/qrcodes/' . $invite['qr_path']) ?>" alt="QR Code" class="img-fluid" style="width: 280px; height: 280px;">
-                </div>
-
-                <!-- Code Unique -->
-                <div class="mx-auto p-3 mb-4" style="background: rgba(106, 13, 173, 0.12); border: 1px solid rgba(106, 13, 173, 0.25); border-radius: 12px; max-width: 100%;">
-                    <div style="color: var(--mm-text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px;">Code Unique</div>
-                    <div class="fw-bold text-white" style="font-size: 0.95rem; letter-spacing: 1px; word-break: break-all;"><?= esc($invite['code_unique']) ?></div>
-                </div>
-
-                <p class="small" style="color: var(--mm-text-muted); line-height: 1.6;">
-                    <i class="bi bi-info-circle me-1"></i>
-                    Présentez ce QR code à l'entrée du <strong>Théâtre Sorano</strong>.<br>
-                    <strong style="color: var(--mm-accent);">Utilisation unique.</strong> Ne le partagez avec personne.
-                </p>
-            </div>
-
-            <!-- Footer -->
-            <div class="py-3 px-4 d-print-none" style="border-top: 1px solid var(--mm-glass-border);">
-                <button onclick="window.print()" class="btn btn-outline-light btn-sm rounded-pill px-4">
-                    <i class="bi bi-printer me-1"></i> Imprimer / PDF
-                </button>
-            </div>
-        </div>
-
-        <!-- Email Animation & Return Section -->
-        <div class="text-center mt-4 d-print-none">
-            <div id="email-status-container" class="glass-card p-3 d-inline-block w-100 mb-3" style="border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03);">
-                <div id="email-sending-state">
-                    <div class="paper-plane-container mb-3">
-                        <i class="bi bi-send-fill paper-plane-icon"></i>
-                    </div>
-                    <p class="mb-0" style="color: var(--mm-text-muted); font-size: 0.9rem;">
-                        <span class="spinner-border spinner-border-sm me-2" style="color: var(--mm-accent);"></span>
-                        Envoi de votre invitation par email en cours...
-                    </p>
-                </div>
-                
-                <div id="email-success-state" style="display: none;">
-                    <div class="mb-2">
-                        <i class="bi bi-check-all" style="font-size: 2.5rem; color: #5dd39e; filter: drop-shadow(0 0 10px rgba(93, 211, 158, 0.4));"></i>
-                    </div>
-                    <p class="mb-2 fw-bold" style="color: #5dd39e; font-size: 0.95rem;">Invitation envoyée sur ce mail :</p>
-                    <p class="mb-0 fw-bold" style="color: white; font-size: 1rem; letter-spacing: 1px;"><?= esc($invite['email']) ?></p>
-                </div>
-            </div>
-
-            <!-- Return Countdown -->
-            <div id="return-container" style="opacity: 0.5; transition: opacity 0.5s;">
-                <div class="d-inline-block px-4 py-2 rounded-pill" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);">
-                    <span style="color: var(--mm-text-muted); font-size: 0.85rem;">Retour automatique dans <strong id="countdown" style="color: var(--mm-accent);">5</strong>s</span>
-                </div>
-                <div class="mt-3">
-                    <div class="mx-auto" style="width: 200px; height: 2px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden;">
-                        <div id="progress-bar" style="width: 100%; height: 100%; background: linear-gradient(90deg, var(--mm-accent), var(--mm-primary));"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <a href="/" class="text-decoration-none footer-text d-block mt-4" style="font-size: 0.8rem; opacity: 0.6;">
-                <i class="bi bi-arrow-left me-1"></i> Revenir à l'accueil
-            </a>
-        </div>
-    </div>
-</div>
-
 <style>
-    .paper-plane-container {
+    :root {
+        --mm-accent-gold: #D4AF37;
+        --mm-accent-soft: rgba(212, 175, 55, 0.2);
+        --mm-card-bg: rgba(25, 10, 45, 0.7);
+    }
+
+    .ticket-container {
+        margin-top: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .premium-ticket {
+        background: #ffffff;
+        border-radius: 40px;
         position: relative;
-        height: 40px;
+        overflow: hidden;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+        max-width: 550px;
+        margin: 0 auto;
+        color: #2c3e50;
+        border: 1px solid #eee;
+    }
+
+    .ticket-header {
+        background: #6A0DAD;
+        padding: 40px 20px;
+        text-align: center;
+        border-bottom: 6px solid #D4AF37;
+    }
+
+    .event-title-main {
+        font-size: 1.8rem;
+        color: #D4AF37;
+        font-weight: 800;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin: 0;
+    }
+
+    .vip-badge-wrapper {
+        margin: 30px 0 20px;
+        text-align: center;
+    }
+
+    .vip-badge {
+        background: #fdf5e6;
+        color: #b8860b;
+        padding: 8px 25px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        display: inline-block;
+        border: 1px solid #f5deb3;
+    }
+
+    .ticket-body {
+        padding: 0 40px 40px;
+        text-align: center;
+    }
+
+    .guest-name-large {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1a1a1a;
+        margin-bottom: 15px;
+    }
+
+    .invitation-text-box {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin-bottom: 30px;
+        padding: 0 10px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .info-item {
+        background: #f9fbfc;
+        padding: 15px;
+        border-left: 4px solid #6A0DAD;
+        text-align: left;
+    }
+
+    .info-label {
+        font-size: 0.6rem;
+        color: #95a5a6;
+        text-transform: uppercase;
+        font-weight: 800;
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+        display: block;
+    }
+
+    .info-label i {
+        color: #D4AF37 !important; /* Gold */
+        margin-right: 8px;
+        font-size: 1.1rem; /* Augmenté de 0.9rem */
+        vertical-align: middle;
+    }
+
+    .info-value {
+        color: #2c3e50;
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+
+    .info-item.full-width {
+        grid-column: span 2;
+    }
+
+    .qr-zone {
+        background: white;
+        padding: 15px;
+        border: 1px solid #eeeeee;
+        border-radius: 20px;
+        display: inline-block;
+        margin: 30px 0 10px;
+    }
+    
+    .qr-image {
+        width: 200px;
+        height: 200px;
+        display: block;
+    }
+
+    .security-code {
+        font-size: 0.65rem;
+        color: #bdc3c7;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 40px;
+    }
+
+    .ticket-footer {
+        background: #fafafa;
+        padding: 30px;
+        border-top: 1px solid #eeeeee;
+        font-size: 0.7rem;
+        color: #bdc3c7;
+        line-height: 1.6;
+    }
+
+    #capture-area {
+        padding: 50px 30px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+        border-radius: 60px;
+        box-shadow: 0 40px 100px rgba(0,0,0,0.15);
+        border: 1px solid rgba(255,255,255,0.8);
+    }
+
+    .download-actions {
         display: flex;
         justify-content: center;
+        margin-top: 40px;
+        margin-bottom: 50px;
+    }
+
+    .btn-download-premium {
+        background: var(--mm-accent-gold);
+        color: #000;
+        padding: 18px 45px;
+        border-radius: 20px;
+        font-weight: 800;
+        font-size: 1.1rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        border: none;
+        display: flex;
         align-items: center;
+        gap: 15px;
+        box-shadow: 0 15px 35px rgba(212, 175, 55, 0.3);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    .paper-plane-icon {
-        font-size: 1.8rem;
-        color: var(--mm-accent);
-        animation: fly 2s infinite ease-in-out;
-        filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.4));
+
+    .btn-download-premium:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 20px 45px rgba(212, 175, 55, 0.5);
+        color: #000;
+        background: #e5c04a;
     }
-    @keyframes fly {
-        0% { transform: translate(-20px, 10px) rotate(-15deg); opacity: 0; }
-        50% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
-        100% { transform: translate(20px, -10px) rotate(15deg); opacity: 0; }
+
+    .btn-download-premium i {
+        font-size: 1.4rem;
     }
 
     @media print {
-        @page { margin: 0; size: auto; }
-        body { background: white !important; color: black !important; padding: 20px !important; }
-        body::before, .math-bg, .d-print-none { display: none !important; }
-        .row { display: block !important; }
-        .col-md-5 { width: 100% !important; max-width: 500px !important; margin: 0 auto !important; }
-        .glass-card { 
-            box-shadow: none !important; 
-            border: 1px solid #ddd !important; 
+        @page { size: A4 portrait; margin: 0; }
+        html, body { height: 100%; margin: 0 !important; padding: 0 !important; background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        
+        .d-print-none, .alert, #email-status, #redirect-msg, .math-bg, nav, footer { display: none !important; }
+        
+        .ticket-container { margin: 0 !important; padding: 0 !important; width: 100% !important; max-width: 100% !important; transform: none !important; }
+        
+        .premium-ticket { 
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            width: 170mm !important;
+            height: auto !important;
             background: white !important;
-            backdrop-filter: none !important;
-            page-break-inside: avoid;
+            border: 1px solid #e0e0e0 !important;
+            border-radius: 25px !important;
+            box-shadow: none !important;
+            overflow: hidden !important;
         }
-        .text-white, .fw-bold { color: #000 !important; }
-        .badge { border: 1px solid #ddd !important; color: #000 !important; }
-        h2, h4 { color: #000 !important; }
+
+        .ticket-header { 
+            background: #6A0DAD !important; 
+            padding: 35px 30px !important;
+            border-bottom: 6px solid #D4AF37 !important;
+            text-align: center !important;
+        }
+
+        .vip-badge { 
+            background: #fdf5e6 !important; 
+            color: #b8860b !important; 
+            padding: 8px 20px !important;
+            border: 1px solid #f5deb3 !important;
+            border-radius: 30px !important;
+            font-size: 11px !important;
+            font-weight: bold !important;
+            margin-bottom: 20px !important;
+        }
+
+        .event-title-main { 
+            color: #D4AF37 !important; 
+            font-size: 28px !important;
+            font-weight: bold !important;
+            margin: 0 !important;
+        }
+
+        .ticket-body { padding: 35px 50px !important; }
+
+        .guest-name-large { 
+            color: #1a1a1a !important; 
+            font-size: 24px !important;
+            font-weight: bold !important;
+            background: none !important;
+            -webkit-text-fill-color: initial !important;
+            margin-bottom: 5px !important;
+        }
+
+        .guest-email { color: #7f8c8d !important; font-size: 14px !important; }
+
+        .info-grid { 
+            display: table !important; 
+            width: 100% !important; 
+            border-spacing: 15px 0 !important;
+            margin: 30px 0 !important;
+        }
+        .info-item { 
+            display: table-cell !important;
+            background: #f9fbfc !important;
+            border-left: 5px solid #6A0DAD !important;
+            padding: 15px !important;
+            border-top: none !important;
+            border-right: none !important;
+            border-bottom: none !important;
+            text-align: left !important;
+        }
+        .info-label { font-size: 9px !important; color: #95a5a6 !important; }
+        .info-value { font-size: 14px !important; color: #2c3e50 !important; }
+        .info-item i { display: none !important; }
+
+        .qr-zone { 
+            background: white !important;
+            padding: 12px !important;
+            border: 1px solid #eeeeee !important;
+            border-radius: 20px !important;
+            margin: 0 auto !important;
+            display: inline-block !important;
+        }
+        .qr-image { width: 180px !important; height: 180px !important; }
+
+        .security-code { background: none !important; border: none !important; color: #bdc3c7 !important; font-size: 9px !important; margin-top: 10px !important; }
+
+        .invitation-text-box {
+            background: none !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 25px 0 !important;
+            color: #7f8c8d !important;
+            font-size: 14px !important;
+            line-height: 1.5 !important;
+            text-align: center !important;
+        }
+        .invitation-text-box p { color: #7f8c8d !important; }
+        .invitation-text-box strong { color: #6A0DAD !important; }
     }
 </style>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const sendingState = document.getElementById('email-sending-state');
-        const successState = document.getElementById('email-success-state');
-        const returnContainer = document.getElementById('return-container');
-        const countdownEl = document.getElementById('countdown');
-        const progressBar = document.getElementById('progress-bar');
+<div class="row justify-content-center px-3">
+    <div class="col-md-6 col-lg-5 ticket-container">
         
-        let seconds = 5;
-        let countdownStarted = false;
+        <!-- Header Success Message -->
+        <?php if (session()->getFlashdata('success')): ?>
+            <div class="alert alert-success border-0 shadow-sm mb-4 text-center" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border-radius: 15px;">
+                <i class="bi bi-check-circle-fill me-2"></i> <?= session()->getFlashdata('success') ?>
+            </div>
+        <?php endif; ?>
 
-        function startCountdown() {
-            if (countdownStarted) return;
-            countdownStarted = true;
-            returnContainer.style.opacity = '1';
+        <div id="capture-area">
+            <div class="premium-ticket">
+                <!-- HEADER -->
+                <div class="ticket-header">
+                    <h1 class="event-title-main">Miss Maths / Miss Sciences</h1>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 0.75rem; letter-spacing: 4px; margin-top: 8px;">IA DE DAKAR &bull; 2026</p>
+                </div>
+
+                <div class="vip-badge-wrapper">
+                    <div class="vip-badge">Invitation Officielle</div>
+                </div>
+
+                <!-- BODY -->
+                <div class="ticket-body">
+                    <h2 class="guest-name-large"><?= esc($invite['prenom']) ?> <?= esc($invite['nom']) ?></h2>
+                    
+                    <div class="invitation-text-box">
+                        Nous avons l'honneur de vous inviter à la cérémonie <strong>MISS MATHS & MISS SCIENCES</strong>, qui met à l'honneur l'intelligence, la créativité et l'excellence des jeunes talents féminins dans les domaines des mathématiques et des sciences.
+                    </div>
+
+                    <!-- INFO GRID -->
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label"><i class="bi bi-telephone-fill me-1"></i> Téléphone de l'invité</span>
+                            <div class="info-value"><?= format_phone_number($invite['telephone']) ?></div>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label"><i class="bi bi-calendar-event-fill me-1"></i> Date & Heure</span>
+                            <div class="info-value">13 Mai 2026 &bull; 09h00</div>
+                        </div>
+                        <div class="info-item full-width">
+                            <span class="info-label"><i class="bi bi-geo-alt-fill me-1" style="color: #D4AF37;"></i> Lieu de l'événement</span>
+                            <div class="info-value">Théâtre National Daniel Sorano</div>
+                        </div>
+
+                        <?php if (!empty($invite['establishment'])): ?>
+                            <div class="info-item">
+                                <span class="info-label"><i class="bi bi-building-fill me-1" style="color: #D4AF37;"></i> <?= ($invite['category_id'] == 3) ? 'Groupe / Entité' : 'Établissement' ?></span>
+                                <div class="info-value"><?= esc($invite['establishment']) ?></div>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if (!empty($invite['class'])): ?>
+                            <div class="info-item">
+                                <span class="info-label"><i class="bi bi-mortarboard-fill me-1" style="color: #D4AF37;"></i> Classe / Niveau</span>
+                                <div class="info-value"><?= esc($invite['class']) ?></div>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if (!empty($invite['profession'])): ?>
+                            <div class="info-item">
+                                <span class="info-label"><i class="bi bi-briefcase-fill me-1"></i> Profession</span>
+                                <div class="info-value"><?= esc($invite['profession']) ?></div>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if (!empty($invite['interest'])): ?>
+                            <div class="info-item full-width">
+                                <span class="info-label"><i class="bi bi-info-circle-fill me-1"></i> Intérêt pour le concours</span>
+                                <div class="info-value"><?= esc($invite['interest']) ?></div>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                    <!-- QR CODE (Canvas pour une capture PDF garantie) -->
+                    <div class="qr-zone" style="background: #fff; padding: 15px; border-radius: 20px;">
+                        <?php 
+                            $qrData = '';
+                            $qPath = FCPATH . 'uploads' . DIRECTORY_SEPARATOR . 'qrcodes' . DIRECTORY_SEPARATOR . $invite['qr_path'];
+                            if (file_exists($qPath)) {
+                                $qrData = base64_encode(file_get_contents($qPath));
+                            }
+                        ?>
+                        <canvas id="qr-canvas" width="200" height="200" style="width: 160px; height: 160px; display: block; margin: 0 auto;"></canvas>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const canvas = document.getElementById('qr-canvas');
+                                if (canvas) {
+                                    const ctx = canvas.getContext('2d');
+                                    const img = new Image();
+                                    img.onload = function() {
+                                        ctx.drawImage(img, 0, 0, 200, 200);
+                                    };
+                                    img.src = "data:image/png;base64,<?= $qrData ?>";
+                                }
+                            });
+                        </script>
+                    </div>
+
+                    <div class="security-code">RÉFÉRENCE : <?= strtoupper(substr($invite['code_unique'], 0, 16)) ?></div>
+
+                    <div class="ticket-footer">
+                        Cette invitation est strictement personnelle et infalsifiable. <br>
+                        Elle devra être présentée sous format numérique ou imprimé au service d'accueil.<br>
+                        <strong>Inspection d'Académie de Dakar &copy; 2026</strong>
+                    </div>
+                </div>
+            </div>
             
-            const timer = setInterval(() => {
-                seconds--;
-                if (countdownEl) countdownEl.textContent = seconds;
-                if (progressBar) progressBar.style.width = ((seconds / 5) * 100) + '%';
-                
-                if (seconds <= 0) {
-                    clearInterval(timer);
-                    window.location.href = "<?= base_url('/') ?>";
+            <div class="certified-text">
+                Document officiel certifié par l'IA de Dakar
+            </div>
+        </div>
+
+        <!-- DOWNLOAD ACTIONS -->
+        <div class="download-actions d-print-none" style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+            <button id="download-pdf" class="btn-download-premium">
+                <i class="bi bi-file-earmark-pdf-fill"></i> Télécharger mon Invitation (PDF)
+            </button>
+        </div>
+
+        <!-- Notification Status -->
+        <div class="text-center mt-5 d-print-none">
+            <div id="email-status" class="p-3 px-4 rounded-pill d-inline-flex align-items-center gap-3" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); min-width: 300px; justify-content: center;">
+                <div class="bi bi-envelope-check-fill text-success fs-4"></div>
+                <span id="status-text" class="text-success" style="font-size: 0.85rem;">Invitation envoyée à <br><strong><?= esc($invite['email']) ?></strong></span>
+            </div>
+
+            <div id="redirect-msg" class="mt-4" style="display: none;">
+                <a href="<?= base_url('/') ?>" class="btn btn-outline-light btn-sm rounded-pill px-4 py-2" style="border-color: rgba(255,255,255,0.2); font-size: 0.8rem; letter-spacing: 1px;">
+                    <i class="bi bi-person-plus me-1"></i> Inscrire une autre personne
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+    // Fonction utilitaire pour s'assurer que les images sont chargées
+    function preloadImages(element) {
+        const images = element.getElementsByTagName('img');
+        const promises = [];
+        for (let img of images) {
+            if (!img.complete) {
+                promises.push(new Promise(resolve => {
+                    img.onload = img.onerror = resolve;
+                }));
+            }
+        }
+        return Promise.all(promises);
+    }
+
+    async function generateCapture(format, btn) {
+        const element = document.getElementById('capture-area');
+        const originalHtml = btn.innerHTML;
+        
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Génération...';
+
+        try {
+            // Attendre que toutes les images (dont le QR Code) soient chargées
+            await preloadImages(element);
+            
+            // Sécurité supplémentaire : Attente forcée
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            window.scrollTo(0, 0);
+
+            const canvas = await html2canvas(element, {
+                scale: 3, // Scale 3 est suffisant pour une qualité d'impression excellente
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: null,
+                logging: false,
+                onclone: (clonedDoc) => {
+                    // Forcer l'affichage du QR Code (Canvas)
+                    const qrCanvas = clonedDoc.getElementById('qr-canvas');
+                    if (qrCanvas) {
+                        qrCanvas.style.display = 'block';
+                        qrCanvas.style.visibility = 'visible';
+                        qrCanvas.style.opacity = '1';
+                    }
+                    // S'assurer que le bouton de téléchargement n'est pas dans le clone
+                    const btnActions = clonedDoc.querySelector('.download-actions');
+                    if (btnActions) btnActions.style.display = 'none';
                 }
-            }, 1000);
+            });
+
+            const fileName = 'Invitation_MissMath_2026';
+
+            if (format === 'png') {
+                const link = document.createElement('a');
+                link.download = `${fileName}.png`;
+                link.href = canvas.toDataURL('image/png', 1.0);
+                link.click();
+            } else if (format === 'pdf') {
+                const { jsPDF } = window.jspdf;
+                const imgData = canvas.toDataURL('image/png', 1.0);
+                
+                // On utilise le ratio de conversion standard (1px = 0.264583mm)
+                // Divisé par 3 car scale: 3 dans html2canvas
+                const imgWidthMM = canvas.width * 0.264583 / 3;
+                const imgHeightMM = canvas.height * 0.264583 / 3;
+                
+                const pdf = new jsPDF({
+                    orientation: imgWidthMM > imgHeightMM ? 'l' : 'p',
+                    unit: 'mm',
+                    format: [imgWidthMM, imgHeightMM]
+                });
+
+                // 1. On ajoute le ticket complet capturé par html2canvas
+                pdf.addImage(imgData, 'PNG', 0, 0, imgWidthMM, imgHeightMM);
+
+                // 2. SOLUTION ULTIME : Injection directe du QR Code par-dessus
+                // Si html2canvas a raté le QR, on le force ici manuellement
+                try {
+                    const qrCanvas = document.getElementById('qr-canvas');
+                    if (qrCanvas) {
+                        const qrData = qrCanvas.toDataURL('image/png');
+                        const qrZone = document.querySelector('.qr-zone');
+                        const capArea = document.getElementById('capture-area');
+                        
+                        // Calcul de la position relative du QR dans la zone de capture
+                        const qrRect = qrZone.getBoundingClientRect();
+                        const capRect = capArea.getBoundingClientRect();
+                        
+                        // Ratio de position (0 à 1)
+                        // On ajoute un léger ajustement pour le padding interne de qr-zone (15px)
+                        const xRatio = (qrRect.left - capRect.left + 15) / capRect.width;
+                        const yRatio = (qrRect.top - capRect.top + 15) / capRect.height;
+                        const wRatio = (qrRect.width - 30) / capRect.width;
+                        const hRatio = (qrRect.height - 30) / capRect.height;
+                        
+                        // Dessiner le QR par-dessus au millimètre près
+                        pdf.addImage(
+                            qrData, 
+                            'PNG', 
+                            xRatio * imgWidthMM, 
+                            yRatio * imgHeightMM, 
+                            wRatio * imgWidthMM, 
+                            hRatio * imgHeightMM
+                        );
+                    }
+                } catch (qrError) {
+                    console.error("Erreur injection QR directe:", qrError);
+                }
+
+                pdf.save(`${fileName}.pdf`);
+            }
+        } catch (err) {
+            console.error("Capture Error:", err);
+            alert("Erreur de génération. Vérifiez votre connexion.");
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const pdfBtn = document.getElementById('download-pdf');
+        
+        if (pdfBtn) {
+            pdfBtn.addEventListener('click', (e) => generateCapture('pdf', e.currentTarget));
         }
 
-        // Déclencher l'envoi de l'email
-        fetch('<?= base_url('/ticket/' . $invite['code_unique'] . '/send-email') ?>', {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': '<?= csrf_hash() ?>'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Une fois l'email envoyé (ou même si erreur mais fin de process)
-            sendingState.style.display = 'none';
-            successState.style.display = 'block';
-            startCountdown();
-        })
-        .catch(e => {
-            console.error('Email error:', e);
-            // On démarre quand même le compte à rebours pour ne pas bloquer l'utilisateur
-            startCountdown();
-        });
+        const redirectMsg = document.getElementById('redirect-msg');
+        if (redirectMsg) redirectMsg.style.display = 'block';
     });
 </script>
 

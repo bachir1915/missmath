@@ -10,6 +10,8 @@ $routes->get('/', 'InscriptionController::index');
 $routes->post('/register', 'InscriptionController::submit');
 $routes->get('/ticket/(:segment)', 'InscriptionController::success/$1');
 $routes->post('/ticket/(:segment)/send-email', 'InscriptionController::sendEmailAjax/$1');
+$routes->post('/check-quota', 'InscriptionController::checkQuota');
+$routes->get('/get-establishments', 'InscriptionController::getEstablishments');
 
 // Route de scan publique - accessible par n'importe quel appareil
 $routes->get('/scan', 'VerificationController::publicScan');

@@ -48,6 +48,23 @@ class InscriptionController extends BaseController
             'social_network' => $this->request->getPost('social_network'),
         ];
 
+        // --- Vérification finale du Quota (Sécurité Serveur) ---
+        if (isset($data['establishment']) && !empty($data['establishment'])) {
+            $estModel = new \App\Models\EstablishmentModel();
+            $remaining = $estModel->getRemainingSeats($data['establishment']);
+            
+            // Si l'établissement existe en base et que le quota est atteint
+            if ($remaining !== null && $remaining <= 0) {
+                if ($this->request->isAJAX()) {
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'errors' => ['quota' => "Désolé, le quota pour cet établissement ({$data['establishment']}) est déjà atteint."]
+                    ]);
+                }
+                return redirect()->back()->withInput()->with('error', "Le quota pour cet établissement est atteint.");
+            }
+        }
+
         $data['code_unique'] = bin2hex(random_bytes(16));
         $data['statut']      = 'en_attente';
         $data['role']        = 'invite';
@@ -55,7 +72,7 @@ class InscriptionController extends BaseController
         if ($this->userModel->insert($data)) {
             $this->generateQr($data['code_unique']);
             
-            // Envoi immédiat de l'email d'invitation
+            // Envoi immédiat de l'invitation par email (automatique et optimisé)
             $this->sendInvitationEmail($data['code_unique']);
 
             if ($this->request->isAJAX()) {
@@ -109,25 +126,33 @@ class InscriptionController extends BaseController
             $cid = $email->setAttachmentCID($qrPath);
         }
 
-        // Générer le PDF
-        try {
-            $options = new Options();
-            $options->set('isRemoteEnabled', true);
-            $options->set('chroot', FCPATH);
-            $dompdf = new Dompdf($options);
-            $html = view('emails/invitation_pdf', [
-                'name'      => $name,
-                'telephone' => $invite['telephone'],
-                'qrPath'    => $qrPath,
-                'code'      => $code
-            ]);
-            $dompdf->loadHtml($html);
-            $dompdf->setPaper('A4', 'portrait');
-            $dompdf->render();
-            file_put_contents($pdfPath, $dompdf->output());
+        // Générer le PDF s'il n'existe pas encore
+        if (!file_exists($pdfPath)) {
+            try {
+                $options = new Options();
+                $options->set('isRemoteEnabled', false); // Désactivé pour la rapidité
+                $options->set('chroot', FCPATH);
+                $dompdf = new Dompdf($options);
+
+                $html = view('emails/invitation_pdf', [
+                    'name'      => $name,
+                    'telephone' => $invite['telephone'],
+                    'qrPath'    => $qrPath,
+                    'code'      => $code,
+                    'invite'    => $invite
+                ]);
+                $dompdf->loadHtml($html);
+                $dompdf->setPaper('A4', 'portrait');
+                $dompdf->render();
+                file_put_contents($pdfPath, $dompdf->output());
+            } catch (\Exception $e) {
+                log_message('error', 'Erreur PDF : ' . $e->getMessage());
+            }
+        }
+
+        // Attacher le PDF s'il est disponible
+        if (file_exists($pdfPath)) {
             $email->attach($pdfPath, 'application/pdf', 'Invitation_MissMaths_2026.pdf');
-        } catch (\Exception $e) {
-            log_message('error', 'Erreur PDF : ' . $e->getMessage());
         }
 
         $message = view('emails/invitation', [
@@ -139,16 +164,81 @@ class InscriptionController extends BaseController
 
         if (!$email->send()) {
             log_message('error', 'Erreur Email : ' . $email->printDebugger(['headers']));
+        } else {
+            log_message('info', 'Email envoyé avec succès à : ' . $to);
         }
     }
 
     /**
      * Envoie l'invitation par email (Appelé via AJAX - gardé pour compatibilité)
      */
+    /**
+     * Vérifie le quota restant pour un établissement (AJAX)
+     */
+    public function checkQuota()
+    {
+        $name = $this->request->getPost('establishment');
+        if (!$name) return $this->response->setJSON(['status' => 'error']);
+
+        $estModel = new \App\Models\EstablishmentModel();
+        $remaining = $estModel->getRemainingSeats($name);
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'remaining' => $remaining
+        ]);
+    }
+
+    /**
+     * Récupère la liste des établissements avec leurs quotas (AJAX)
+     */
+    public function getEstablishments()
+    {
+        $type = $this->request->getGet('type'); // 'cem' ou 'lycee'
+        if (!$type) return $this->response->setJSON([]);
+
+        $cache = \Config\Services::cache();
+        $cacheKey = "establishments_list_{$type}";
+        
+        // Tentative de récupération depuis le cache
+        if ($cachedData = $cache->get($cacheKey)) {
+            return $this->response->setJSON($cachedData);
+        }
+
+        $estModel = new \App\Models\EstablishmentModel();
+        $establishments = $estModel->where('type', $type)
+                                   ->orderBy('ief', 'ASC')
+                                   ->orderBy('name', 'ASC')
+                                   ->findAll();
+
+        $db = \Config\Database::connect();
+        // On récupère les comptes en une seule requête (Optimisation Performance)
+        $counts = $db->table('utilisateurs')
+                     ->select('establishment, COUNT(*) as total')
+                     ->whereIn('establishment', array_column($establishments, 'name'))
+                     ->groupBy('establishment')
+                     ->get()
+                     ->getResultArray();
+        
+        $countMap = array_column($counts, 'total', 'establishment');
+
+        // On calcule les places restantes pour chaque établissement
+        foreach ($establishments as &$est) {
+            $currentCount = $countMap[$est['name']] ?? 0;
+            $est['remaining'] = $est['quota'] - $currentCount;
+        }
+
+        // Mise en cache pour 5 minutes (300 secondes)
+        $cache->save($cacheKey, $establishments, 300);
+
+        return $this->response->setJSON($establishments);
+    }
+
     public function sendEmailAjax($code)
     {
-        // L'email est désormais envoyé directement lors de l'inscription.
-        // On retourne juste un succès pour ne pas casser l'animation du ticket.
+        // Envoi de l'invitation en arrière-plan
+        $this->sendInvitationEmail($code);
+        
         return $this->response->setJSON(['status' => 'success']);
     }
 
@@ -157,13 +247,19 @@ class InscriptionController extends BaseController
      */
     public function success($code)
     {
-        $data['invite'] = $this->userModel->where('code_unique', $code)->first();
+        $invite = $this->userModel->where('code_unique', $code)->first();
 
-        if (!$data['invite']) {
+        if (!$invite) {
             return redirect()->to('/')->with('error', 'Invitation invalide.');
         }
 
-        return view('public/ticket', $data);
+        $estModel = new \App\Models\EstablishmentModel();
+        $remaining = $estModel->getRemainingSeats($invite['establishment']);
+
+        return view('public/ticket', [
+            'invite'    => $invite,
+            'remaining' => $remaining
+        ]);
     }
 
     /**

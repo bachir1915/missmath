@@ -45,84 +45,89 @@
                     <div class="status-icon-glow" style="background: <?= $current['glow'] ?>;"></div>
                     <i class="bi <?= $current['icon'] ?> display-1 position-relative" style="color: <?= $current['accent'] ?>; filter: drop-shadow(0 0 20px <?= $current['accent'] ?>80);"></i>
                 </div>
-                <h2 class="fw-bold mb-0 text-white position-relative" style="letter-spacing: 4px; font-size: 1.8rem; text-shadow: 0 4px 10px rgba(0,0,0,0.3);"><?= $current['title'] ?></h2>
+                <h2 class="fw-bold mb-0 text-white position-relative scan-title" style="text-shadow: 0 4px 10px rgba(0,0,0,0.3);"><?= $current['title'] ?></h2>
             </div>
 
             <div class="card-body p-4 p-md-5">
                 <?php if ($invite): ?>
-                    <!-- Badge Invité -->
-                    <div class="mb-5 position-relative">
-                        <div class="d-inline-block px-3 py-1 rounded-pill mb-3" style="background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.2);">
-                            <span style="color: var(--mm-accent); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 800;">INVITÉ(E) OFFICIEL(LE)</span>
-                        </div>
-                        <h2 class="fw-bold text-white mb-1" style="font-size: 2rem;"><?= esc($invite['prenom']) ?> <?= esc($invite['nom']) ?></h2>
-                        <p style="color: var(--mm-text-muted); font-size: 1.1rem;"><?= esc($invite['email']) ?></p>
+                    <!-- Identité de l'invité -->
+                    <div class="mb-5">
+                        <h2 class="fw-bold text-white mb-1 guest-name" style="letter-spacing: -1px;"><?= esc($invite['prenom']) ?> <?= esc($invite['nom']) ?></h2>
+                        <p style="color: var(--mm-accent); font-weight: 500; font-size: 1rem; letter-spacing: 1px;"><?= esc($invite['email']) ?></p>
                     </div>
 
-                    <!-- Fiche de Détails Style VIP -->
-                    <div class="p-4 rounded-4 mb-5 text-start shadow-inner" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); box-shadow: inset 0 0 20px rgba(0,0,0,0.2);">
-                        <div class="row g-4 mb-4">
-                            <div class="col-6">
-                                <label class="d-block text-muted small text-uppercase mb-1" style="letter-spacing: 1px; font-size: 0.6rem;">Établissement</label>
-                                <div class="text-white fw-bold border-start border-2 ps-2" style="border-color: var(--mm-accent) !important;">
-                                    <?= esc($invite['establishment'] ?: 'Non renseigné') ?>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <label class="d-block text-muted small text-uppercase mb-1" style="letter-spacing: 1px; font-size: 0.6rem;">Classe / Niveau</label>
-                                <div class="text-white fw-bold border-start border-2 ps-2" style="border-color: var(--mm-accent) !important;">
-                                    <?= esc($invite['class'] ?: 'N/A') ?>
-                                </div>
+                    <!-- Liste d'informations Premium -->
+                    <div class="text-start mt-5">
+                        <!-- Téléphone (Toujours présent) -->
+                        <div class="d-flex align-items-center mb-3 p-3 rounded-3 info-item">
+                            <div class="me-3 opacity-50"><i class="bi bi-telephone fs-3"></i></div>
+                            <div>
+                                <span class="d-block text-uppercase fw-bold" style="color: var(--mm-accent); font-size: 0.65rem; letter-spacing: 2px;">Numéro de Téléphone</span>
+                                <span class="text-white fs-5 fw-bold"><?= format_phone_number($invite['telephone']) ?></span>
                             </div>
                         </div>
-                        <div class="row g-4 mb-4">
-                            <div class="col-6">
-                                <label class="d-block text-muted small text-uppercase mb-1" style="letter-spacing: 1px; font-size: 0.6rem;">Téléphone</label>
-                                <div class="text-white fw-bold border-start border-2 ps-2" style="border-color: var(--mm-primary-light) !important;">
-                                    <?= esc($invite['telephone']) ?>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <label class="d-block text-muted small text-uppercase mb-1" style="letter-spacing: 1px; font-size: 0.6rem;">Communauté</label>
-                                <div class="text-white fw-bold border-start border-2 ps-2 text-capitalize" style="border-color: var(--mm-primary-light) !important;">
-                                    <?= esc($invite['social_network'] ?: 'Membre') ?>
-                                </div>
+
+                        <!-- Établissement / Groupe -->
+                        <?php if (!empty($invite['establishment'])): ?>
+                        <div class="d-flex align-items-center mb-3 p-3 rounded-3 info-item">
+                            <div class="me-3 opacity-50"><i class="bi bi-building fs-3"></i></div>
+                            <div>
+                                <span class="d-block text-uppercase fw-bold" style="color: var(--mm-accent); font-size: 0.65rem; letter-spacing: 2px;"><?= ($invite['category_id'] == 3) ? 'Entité / Groupe' : 'Établissement' ?></span>
+                                <span class="text-white fs-5 fw-bold"><?= esc($invite['establishment']) ?></span>
                             </div>
                         </div>
-                        
-                        <div class="pt-3 border-top border-white border-opacity-10 d-flex align-items-center justify-content-between">
-                            <span class="text-muted small text-uppercase" style="letter-spacing: 1px;">État de l'invitation</span>
-                            <span class="px-3 py-1 rounded-pill fw-bold" style="background: <?= $invite['statut'] === 'valide' ? 'rgba(255, 107, 107, 0.15)' : 'rgba(93, 211, 158, 0.15)' ?>; color: <?= $invite['statut'] === 'valide' ? '#ff6b6b' : '#5dd39e' ?>; font-size: 0.75rem; border: 1px solid currentColor;">
-                                <?= strtoupper($invite['statut'] === 'valide' ? 'DÉJÀ VALIDÉE' : 'VALIDE POUR ENTRÉE') ?>
-                            </span>
+                        <?php endif; ?>
+
+                        <!-- Classe -->
+                        <?php if (!empty($invite['class'])): ?>
+                        <div class="d-flex align-items-center mb-3 p-3 rounded-3 info-item">
+                            <div class="me-3 opacity-50"><i class="bi bi-mortarboard fs-3"></i></div>
+                            <div>
+                                <span class="d-block text-uppercase fw-bold" style="color: var(--mm-accent); font-size: 0.65rem; letter-spacing: 2px;">Classe / Niveau</span>
+                                <span class="text-white fs-5 fw-bold"><?= esc($invite['class']) ?></span>
+                            </div>
                         </div>
+                        <?php endif; ?>
+
+                        <!-- Profession -->
+                        <?php if (!empty($invite['profession'])): ?>
+                        <div class="d-flex align-items-center mb-3 p-3 rounded-3 info-item">
+                            <div class="me-3 opacity-50"><i class="bi bi-briefcase fs-3"></i></div>
+                            <div>
+                                <span class="d-block text-uppercase fw-bold" style="color: var(--mm-accent); font-size: 0.65rem; letter-spacing: 2px;">Profession</span>
+                                <span class="text-white fs-5 fw-bold"><?= esc($invite['profession']) ?></span>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+
+                        <!-- Réseau Social -->
+                        <?php if (!empty($invite['social_network'])): ?>
+                        <div class="d-flex align-items-center mb-3 p-3 rounded-3 info-item">
+                            <div class="me-3 opacity-50"><i class="bi bi-share fs-3"></i></div>
+                            <div>
+                                <span class="d-block text-uppercase fw-bold" style="color: var(--mm-accent); font-size: 0.65rem; letter-spacing: 2px;">Réseau Social</span>
+                                <span class="text-white fs-5 fw-bold text-capitalize"><?= esc($invite['social_network']) ?></span>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+
+                        <!-- Intérêt -->
+                        <?php if (!empty($invite['interest'])): ?>
+                        <div class="mt-4 p-3 rounded-3 info-item">
+                            <span class="d-block text-uppercase fw-bold mb-1" style="color: var(--mm-accent); font-size: 0.65rem; letter-spacing: 2px;">Intérêt pour le concours</span>
+                            <span class="text-white fw-bold" style="font-size: 0.95rem; line-height: 1.5;"><?= esc($invite['interest']) ?></span>
+                        </div>
+                        <?php endif; ?>
                     </div>
                 <?php endif; ?>
 
-                <!-- Message de Feedback -->
-                <div class="mb-5 py-3 px-4 rounded-3 d-flex align-items-center justify-content-center" style="background: rgba(255,255,255,0.03); border-left: 4px solid <?= $current['accent'] ?>;">
-                    <i class="bi bi-info-circle-fill me-3" style="color: <?= $current['accent'] ?>; font-size: 1.2rem;"></i>
-                    <span class="fw-medium text-white"><?= esc($message) ?></span>
+                <!-- Message de Feedback (Plus discret) -->
+                <div class="mt-5 pt-4 border-top border-white border-opacity-10">
+                    <p class="mb-0 fw-bold" style="color: <?= $current['accent'] ?>; letter-spacing: 1px; font-size: 0.9rem;">
+                        <i class="bi <?= $current['icon'] ?> me-2"></i>
+                        <?= esc($message) ?>
+                    </p>
                 </div>
-
-                <?php if (isset($isAdmin) && $isAdmin && $status === 'success'): ?>
-                    <div class="alert alert-success border-0 py-3 mb-5 fade-in" style="background: linear-gradient(90deg, rgba(93, 211, 158, 0.1) 0%, transparent 100%);">
-                        <div class="d-flex align-items-center">
-                            <div class="bg-success rounded-circle p-2 me-3" style="--bs-bg-opacity: .2;">
-                                <i class="bi bi-shield-check text-success"></i>
-                            </div>
-                            <div class="text-start">
-                                <div class="fw-bold text-success small">STATUT ADMINISTRATEUR</div>
-                                <div class="text-white-50 smaller" style="font-size: 0.75rem;">L'entrée a été enregistrée dans le système.</div>
-                            </div>
-                        </div>
-                    </div>
-                <?php endif; ?>
-
-                <!-- Bouton de Retour Premium -->
-                <a href="/" class="btn-premium w-100 py-3 text-decoration-none d-block">
-                    <i class="bi bi-house-door-fill me-2"></i>RETOUR À L'ACCUEIL
-                </a>
             </div>
         </div>
         
@@ -135,27 +140,63 @@
 </div>
 
 <style>
+    /* Halo de statut adaptatif */
     .status-icon-glow {
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        width: 120px;
-        height: 120px;
+        width: clamp(60px, 20vw, 120px);
+        height: clamp(60px, 20vw, 120px);
         border-radius: 50%;
-        animation: pulseGlow 2s infinite;
+        animation: pulseGlow 3s infinite;
         z-index: 0;
     }
+    
     @keyframes pulseGlow {
-        0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
-        50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.2; }
-        100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+        0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.4; }
+        50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.1; }
+        100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.4; }
     }
-    .shadow-inner {
-        box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+
+    /* Typographie Fluide Premium */
+    .scan-title {
+        font-size: clamp(1.2rem, 5vw, 1.8rem);
+        letter-spacing: clamp(2px, 1vw, 4px);
     }
-    .smaller {
-        font-size: 0.8rem;
+    .guest-name {
+        font-size: clamp(1.5rem, 6vw, 2.2rem) !important;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    /* Interactivité Info-Item */
+    .info-item {
+        background: rgba(255,255,255,0.02); 
+        border: 1px solid rgba(255,255,255,0.05);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .info-item:hover {
+        background: rgba(255,255,255,0.05);
+        transform: translateX(8px);
+        border-color: rgba(255,255,255,0.1);
+    }
+
+    /* Ajustements pour très petits écrans (iPhone SE, etc.) */
+    @media (max-width: 360px) {
+        .card-body { padding: 1.25rem !important; }
+        .p-5 { padding: 2rem !important; }
+        .fs-4 { font-size: 1.2rem !important; }
+        .fs-5 { font-size: 0.9rem !important; }
+        .info-item { padding: 0.75rem !important; margin-bottom: 0.75rem !important; }
+    }
+
+    /* Correction des textes longs */
+    .text-truncate-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;  
+        overflow: hidden;
     }
 </style>
 <?= $this->endSection() ?>

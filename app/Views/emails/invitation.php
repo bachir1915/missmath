@@ -15,7 +15,7 @@
 
             <h2 style='color: #2D3436; font-size: 24px; margin-bottom: 15px; font-weight: 700;'>Félicitations <?= esc($name) ?>,</h2>
             <p style='font-size: 17px; line-height: 1.7; color: #636e72; margin-bottom: 40px;'>
-                Nous sommes honorés de vous compter parmi nos invités pour la prestigieuse cérémonie de remise des prix <strong>Miss Maths/Miss Sciences 2026</strong>.
+                Nous avons l'honneur de vous inviter à la cérémonie <strong>MISS MATHS & MISS SCIENCES</strong>, qui met à l'honneur l'intelligence, la créativité et l'excellence des jeunes talents féminins dans les domaines des mathématiques et des sciences.
             </p>
             
             <!-- Event Box -->
@@ -31,23 +31,44 @@
             </div>
 
             <!-- QR Code Section -->
-            <div style='margin: 0 auto 40px; padding: 25px; background-color: #ffffff; border: 2px solid #eef2f1; border-radius: 20px; width: fit-content;'>
-                <?php if ($cid): ?>
-                    <img src='cid:<?= $cid ?>' alt='Pass QR Code' style='width: 180px; display: block;'>
-                <?php else: ?>
-                    <p style='color: #6A0DAD; font-weight: bold;'>QR Code joint en annexe</p>
-                <?php endif; ?>
-                <p style='margin: 15px 0 0 0; font-size: 11px; color: #b2bec3; text-transform: uppercase; letter-spacing: 2px;'>Pass Numérique Sécurisé</p>
+            <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto 40px;">
+                <tr>
+                    <td align="center" style="background-color: #ffffff; border: 2px solid #eef2f1; border-radius: 20px; padding: 25px;">
+                        <?php if ($cid): ?>
+                            <img src='cid:<?= $cid ?>' alt='Pass QR Code' width="180" style='display: block; border: 0;'>
+                        <?php else: ?>
+                            <p style='color: #6A0DAD; font-weight: bold;'>QR Code joint en annexe</p>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Download Button -->
+            <div style='margin: 40px 0;'>
+                <a href="<?= base_url('/invite/ticket/' . $code) ?>" 
+                   style='background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%); 
+                          color: #ffffff; 
+                          padding: 18px 35px; 
+                          text-decoration: none; 
+                          border-radius: 50px; 
+                          font-weight: 800; 
+                          text-transform: uppercase; 
+                          letter-spacing: 2px; 
+                          font-size: 14px; 
+                          display: inline-block;
+                          box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3);'>
+                   📥 Télécharger mon Invitation (PDF)
+                </a>
             </div>
 
-            <p style='font-size: 15px; color: #636e72; margin-bottom: 35px; background: #fff4e5; padding: 15px; border-radius: 12px; border: 1px dashed #d4af37;'>
-                <i style='font-style: normal; font-size: 20px;'>📎</i> <strong>Note Importante :</strong> Votre invitation officielle est jointe à cet email en format <strong>PDF</strong> pour une impression facile.
-            </p>
-
-            <!-- Action Button -->
-            <a href='<?= esc($link) ?>' style='display: inline-block; background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%); color: #ffffff; padding: 20px 40px; text-decoration: none; border-radius: 16px; font-weight: 700; font-size: 16px; transition: all 0.3s ease; box-shadow: 0 10px 25px rgba(184, 134, 11, 0.3);'>
-                VOIR MON TICKET EN LIGNE
-            </a>
+            <div style='font-size: 15px; color: #636e72; margin-top: 20px; padding: 20px; background-color: #f8f9fa; border-radius: 15px; border: 1px solid #eef2f1;'>
+                <p style="margin: 0; font-weight: 600; color: #2D3436;">
+                    📄 Votre invitation officielle est aussi jointe à cet email.
+                </p>
+                <p style="margin: 5px 0 0 0; font-size: 14px;">
+                    Vous pouvez cliquer sur le bouton ci-dessus ou utiliser le fichier <strong>PDF</strong> joint pour votre accès.
+                </p>
+            </div>
         </div>
 
         <!-- Premium Footer -->

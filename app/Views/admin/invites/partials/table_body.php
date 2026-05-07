@@ -37,7 +37,7 @@
     </td>
     <td>
         <div style="color: var(--admin-muted); font-size: 0.85rem;"><i class="bi bi-envelope me-2"></i><?= esc($invite['email']) ?></div>
-        <div style="color: var(--admin-muted); font-size: 0.85rem; margin-top: 2px;"><i class="bi bi-telephone me-2"></i><?= esc($invite['telephone']) ?></div>
+        <div style="color: var(--admin-muted); font-size: 0.85rem; margin-top: 2px;"><i class="bi bi-telephone me-2"></i><?= format_phone_number($invite['telephone']) ?></div>
         <?php if($invite['social_network'] || $invite['interest']): ?>
             <div style="color: var(--admin-muted); font-size: 0.75rem; margin-top: 4px;" class="fst-italic">
                 <?= $invite['social_network'] ? '<i class="bi bi-chat-dots me-1"></i>'.esc($invite['social_network']).' &nbsp;' : '' ?>
