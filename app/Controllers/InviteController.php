@@ -4,6 +4,10 @@ namespace App\Controllers;
 
 use CodeIgniter\RESTful\ResourceController;
 use App\Models\UserModel;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 class InviteController extends ResourceController
 {
@@ -87,9 +91,26 @@ class InviteController extends ResourceController
     public function create()
     {
         $data = $this->request->getPost();
-        if ($this->model->insert($data)) {
-            return redirect()->to('/admin/invites')->with('success', 'Invite cree avec succes.');
+        
+        // Configuration par défaut pour un nouvel invité créé par l'admin
+        $data['code_unique'] = bin2hex(random_bytes(16));
+        $data['role']        = 'invite';
+        
+        // Si le statut n'est pas spécifié, on met 'en_attente'
+        if (!isset($data['statut'])) {
+            $data['statut'] = 'en_attente';
         }
+
+        if ($this->model->insert($data)) {
+            // Génération du QR Code
+            $this->generateQr($data['code_unique']);
+            
+            // Envoi de l'email d'invitation
+            $this->sendInvitationEmail($data['code_unique']);
+
+            return redirect()->to('/admin/invites')->with('success', 'Invité créé avec succès et invitation envoyée.');
+        }
+        
         return redirect()->back()->withInput()->with('errors', $this->model->errors());
     }
 
@@ -191,5 +212,97 @@ class InviteController extends ResourceController
     {
         $this->model->delete($id);
         return redirect()->to('/admin/invites')->with('success', 'Invite supprime.');
+    }
+
+    /**
+     * Logique de génération du QR Code.
+     */
+    private function generateQr($code)
+    {
+        $path = FCPATH . 'uploads/qrcodes/';
+        if (!is_dir($path)) {
+            mkdir($path, 0777, true);
+        }
+
+        $url = base_url("/scan?code=$code");
+
+        $qrCode = QrCode::create($url)
+            ->setSize(400)
+            ->setMargin(10);
+        
+        $writer = new PngWriter();
+        $result = $writer->write($qrCode);
+        
+        $fileName = $code . '.png';
+        $result->saveToFile($path . $fileName);
+
+        $this->model->where('code_unique', $code)->set(['qr_path' => $fileName])->update();
+    }
+
+    /**
+     * Envoie l'invitation par email
+     */
+    private function sendInvitationEmail($code)
+    {
+        $invite = $this->model->where('code_unique', $code)->first();
+        if (!$invite) return;
+
+        $to   = $invite['email'];
+        $name = $invite['prenom'] . ' ' . $invite['nom'];
+        $link = base_url("/ticket/$code");
+        $qrPath  = FCPATH . 'uploads/qrcodes/' . $code . '.png';
+        $pdfPath = FCPATH . 'uploads/tickets/ticket_' . $code . '.pdf';
+
+        if (!is_dir(FCPATH . 'uploads/tickets/')) {
+            mkdir(FCPATH . 'uploads/tickets/', 0777, true);
+        }
+
+        $email = \Config\Services::email();
+        $email->setTo($to);
+        $email->setSubject('✨ Votre Invitation Officielle - Miss Maths/Miss Sciences 2026');
+
+        $cid = '';
+        if (file_exists($qrPath)) {
+            $email->attach($qrPath);
+            $cid = $email->setAttachmentCID($qrPath);
+        }
+
+        if (!file_exists($pdfPath)) {
+            try {
+                $options = new Options();
+                $options->set('isRemoteEnabled', false);
+                $options->set('chroot', FCPATH);
+                $dompdf = new Dompdf($options);
+
+                $html = view('emails/invitation_pdf', [
+                    'name'      => $name,
+                    'telephone' => $invite['telephone'],
+                    'qrPath'    => $qrPath,
+                    'code'      => $code,
+                    'invite'    => $invite
+                ]);
+                $dompdf->loadHtml($html);
+                $dompdf->setPaper('A4', 'portrait');
+                $dompdf->render();
+                file_put_contents($pdfPath, $dompdf->output());
+            } catch (\Exception $e) {
+                log_message('error', 'Erreur PDF : ' . $e->getMessage());
+            }
+        }
+
+        if (file_exists($pdfPath)) {
+            $email->attach($pdfPath, 'application/pdf', 'Invitation_MissMaths_2026.pdf');
+        }
+
+        $message = view('emails/invitation', [
+            'name' => $name,
+            'link' => $link,
+            'cid'  => $cid
+        ]);
+        $email->setMessage($message);
+
+        if (!$email->send()) {
+            log_message('error', 'Erreur Email : ' . $email->printDebugger(['headers']));
+        }
     }
 }

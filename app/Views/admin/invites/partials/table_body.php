@@ -1,6 +1,6 @@
 <?php if (empty($invites)): ?>
 <tr>
-    <td colspan="5" class="text-center py-4 text-muted">
+    <td colspan="6" class="text-center py-4 text-muted">
         <i class="bi bi-inbox fs-2 d-block mb-2"></i>
         Aucun invité trouvé pour ces critères.
     </td>
@@ -38,12 +38,36 @@
     <td>
         <div style="color: var(--admin-muted); font-size: 0.85rem;"><i class="bi bi-envelope me-2"></i><?= esc($invite['email']) ?></div>
         <div style="color: var(--admin-muted); font-size: 0.85rem; margin-top: 2px;"><i class="bi bi-telephone me-2"></i><?= format_phone_number($invite['telephone']) ?></div>
-        <?php if($invite['social_network'] || $invite['interest']): ?>
+        <?php if($invite['interest']): ?>
             <div style="color: var(--admin-muted); font-size: 0.75rem; margin-top: 4px;" class="fst-italic">
-                <?= $invite['social_network'] ? '<i class="bi bi-chat-dots me-1"></i>'.esc($invite['social_network']).' &nbsp;' : '' ?>
-                <?= $invite['interest'] ? '<i class="bi bi-heart me-1"></i>'.esc($invite['interest']) : '' ?>
+                <i class="bi bi-heart me-1"></i><?= esc($invite['interest']) ?>
             </div>
         <?php endif; ?>
+    </td>
+    <td>
+        <?php 
+            $sn = strtolower($invite['social_network'] ?? '');
+            if ($sn == 'whatsapp'): ?>
+                <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3">
+                    <i class="bi bi-whatsapp me-1"></i>WhatsApp
+                </span>
+            <?php elseif ($sn == 'telegram'): ?>
+                <span class="badge rounded-pill bg-info bg-opacity-10 text-info border border-info border-opacity-25 px-3">
+                    <i class="bi bi-telegram me-1"></i>Telegram
+                </span>
+            <?php elseif ($sn == 'facebook'): ?>
+                <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3">
+                    <i class="bi bi-facebook me-1"></i>Facebook
+                </span>
+            <?php elseif ($sn == 'instagram'): ?>
+                <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3">
+                    <i class="bi bi-instagram me-1"></i>Instagram
+                </span>
+            <?php else: ?>
+                <span class="badge rounded-pill bg-secondary bg-opacity-10 text-muted border border-secondary border-opacity-25 px-3">
+                    <i class="bi bi-dash-circle me-1"></i>Aucun
+                </span>
+            <?php endif; ?>
     </td>
     <td>
         <?php if ($invite['statut'] == 'en_attente'): ?>

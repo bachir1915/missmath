@@ -59,6 +59,7 @@
                         <th>Profil & Identité</th>
                         <th>Contact & Détails</th>
                         <th>Statut</th>
+                        <th>Réseau</th>
                         <th class="text-end pe-4">Actions</th>
                     </tr>
                 </thead>
@@ -134,16 +135,16 @@
             if(data.status === 'success') {
                 const row = btn.closest('tr');
                 
-                // Update Statut (Column 4)
-                const statusTd = row.querySelector('td:nth-child(4)');
+                // Update Statut (Column 5 because we added Réseau)
+                const statusTd = row.querySelector('td:nth-child(5)');
                 statusTd.innerHTML = `
                     <span class="badge-status badge-validated pulse-success">
                         <i class="bi bi-check-circle-fill me-1"></i>Validé le ${data.date}
                     </span>
                 `;
                 
-                // Remove Validate and Cancel buttons from Actions (Column 5)
-                const actionTd = row.querySelector('td:nth-child(5)');
+                // Remove Validate and Cancel buttons from Actions (Column 6)
+                const actionTd = row.querySelector('td:nth-child(6)');
                 const validateBtn = actionTd.querySelector('.validate');
                 const cancelBtn = actionTd.querySelector('.cancel');
                 if (validateBtn) validateBtn.remove();
@@ -168,7 +169,7 @@
 
     function fetchInvites() {
         const tbody = document.querySelector('#invitesTable tbody');
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5"><div class="spinner-border text-primary" role="status"></div><div class="mt-2 text-muted">Chargement...</div></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-5"><div class="spinner-border text-primary" role="status"></div><div class="mt-2 text-muted">Chargement...</div></td></tr>';
 
         let url = `/admin/invites?status=${currentStatus}`;
         if (currentCategory) url += `&category=${currentCategory}`;
@@ -203,7 +204,7 @@
         })
         .catch(error => {
             console.error('Error fetching data:', error);
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-danger">Erreur lors du chargement des données.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-danger">Erreur lors du chargement des données.</td></tr>';
         });
     }
 

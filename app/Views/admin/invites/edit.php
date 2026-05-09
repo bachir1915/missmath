@@ -43,11 +43,22 @@
                     <input type="text" name="telephone" class="form-control" value="<?= esc($invite['telephone']) ?>" required>
                 </div>
 
+                <div class="mb-3">
+                    <label class="form-label">Réseau Social Rejoint</label>
+                    <select name="social_network" class="form-select">
+                        <option value="" <?= empty($invite['social_network']) ? 'selected' : '' ?>>Aucun / Non renseigné</option>
+                        <option value="WhatsApp" <?= $invite['social_network'] == 'WhatsApp' ? 'selected' : '' ?>>WhatsApp</option>
+                        <option value="Telegram" <?= $invite['social_network'] == 'Telegram' ? 'selected' : '' ?>>Telegram</option>
+                        <option value="Facebook" <?= $invite['social_network'] == 'Facebook' ? 'selected' : '' ?>>Facebook</option>
+                        <option value="Instagram" <?= $invite['social_network'] == 'Instagram' ? 'selected' : '' ?>>Instagram</option>
+                    </select>
+                </div>
+
                 <div class="mb-4">
                     <label class="form-label">Statut</label>
                     <select name="statut" class="form-select">
                         <option value="en_attente" <?= $invite['statut'] == 'en_attente' ? 'selected' : '' ?>>En attente</option>
-                        <option value="utilise" <?= $invite['statut'] == 'utilise' ? 'selected' : '' ?>>Utilisé / Validé</option>
+                        <option value="valide" <?= $invite['statut'] == 'valide' ? 'selected' : '' ?>>Utilisé / Validé</option>
                         <option value="annule" <?= $invite['statut'] == 'annule' ? 'selected' : '' ?>>Annulé</option>
                     </select>
                 </div>

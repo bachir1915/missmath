@@ -422,7 +422,7 @@
 
         <!-- DOWNLOAD ACTIONS -->
         <div class="download-actions d-print-none" style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-            <button id="download-pdf" class="btn-download-premium">
+            <button type="button" id="download-pdf" class="btn-download-premium">
                 <i class="bi bi-file-earmark-pdf-fill"></i> Télécharger mon Invitation (PDF)
             </button>
         </div>
@@ -572,7 +572,11 @@
         const pdfBtn = document.getElementById('download-pdf');
         
         if (pdfBtn) {
-            pdfBtn.addEventListener('click', (e) => generateCapture('pdf', e.currentTarget));
+            pdfBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                generateCapture('pdf', e.currentTarget);
+            });
         }
 
         const redirectMsg = document.getElementById('redirect-msg');

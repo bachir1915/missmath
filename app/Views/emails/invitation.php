@@ -45,7 +45,7 @@
 
             <!-- Download Button -->
             <div style='margin: 40px 0;'>
-                <a href="<?= base_url('/invite/ticket/' . $code) ?>" 
+                <a href="<?= $link ?>" 
                    style='background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%); 
                           color: #ffffff; 
                           padding: 18px 35px; 

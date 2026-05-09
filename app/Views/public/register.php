@@ -7,8 +7,8 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.10/build/css/intlTelInput.css">
 <style>
     .iti { width: 100%; }
-    .iti__country-list { background-color: #1a1a2e; border: 1px solid rgba(255,255,255,0.1); color: white; }
-    .iti__country:hover { background-color: rgba(255,255,255,0.05); }
+    .iti__country-list { background-color: #1a1a2e; border: 1px solid rgba(255, 255, 255, 0.1); color: white; }
+    .iti__country:hover { background-color: rgba(255, 255, 255, 0.05); }
     
     /* Category Selector Styles */
     .category-grid {
@@ -21,8 +21,8 @@
     .cat-item {
         background: rgba(255, 255, 255, 0.03);
         border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 10px 5px;
+        border-radius: 16px;
+        padding: 15px 10px;
         text-align: center;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -38,7 +38,7 @@
     }
     
     .cat-item span {
-        font-size: 0.65rem;
+        font-size: 0.8rem;
         font-weight: 700;
         text-transform: uppercase;
         color: var(--mm-text-muted);
@@ -46,8 +46,8 @@
     }
     
     .cat-item:hover {
-        background: rgba(255, 255, 255, 0.06);
-        border-color: rgba(212, 175, 55, 0.3);
+        background: #ffffff;
+        border-color: var(--mm-accent);
     }
     
     .cat-item.active {
@@ -153,9 +153,9 @@
         z-index: 10;
     }
     .select-search {
-        background: rgba(0, 0, 0, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: white;
+        background: #f8f9ff;
+        border: 1px solid rgba(106, 13, 173, 0.1);
+        color: #1a1a2e;
         width: 100%;
         padding: 10px 15px;
         border-radius: 8px;
@@ -283,6 +283,60 @@
         transform: none !important;
         box-shadow: none !important;
         opacity: 0.6;
+    }
+
+    /* Social Icons Row */
+    .social-icons-row {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        margin-top: 10px;
+        flex-wrap: wrap;
+    }
+    .social-icon-btn {
+        width: 58px;
+        height: 58px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--mm-text-muted);
+        font-size: 1.5rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+        position: relative;
+    }
+    .social-icon-btn:hover {
+        background: rgba(212, 175, 55, 0.12);
+        border-color: var(--mm-accent);
+        color: var(--mm-accent);
+        transform: translateY(-4px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+    .social-icon-btn.active {
+        background: rgba(106, 13, 173, 0.2);
+        border-color: var(--mm-accent);
+        color: var(--mm-accent);
+        box-shadow: 0 5px 20px rgba(106, 13, 173, 0.4);
+    }
+    .social-icon-btn.active::after {
+        content: '\F26E'; /* bi-check-circle-fill */
+        font-family: "bootstrap-icons";
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        font-size: 0.9rem;
+        background: var(--mm-accent);
+        color: #1a1a2e;
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #1a1a2e;
     }
 </style>
 <?= $this->endSection() ?>
@@ -459,32 +513,38 @@
 
                 <!-- Section Intégration Communauté -->
                 <div class="form-subtitle">Restons connectés</div>
-                <div class="glass-card p-3 mb-4" style="background: rgba(106, 13, 173, 0.05); border: 1px solid rgba(212, 175, 55, 0.2);">
+                <div class="glass-card p-3 mb-4" style="background: rgba(106, 13, 173, 0.03); border: 1px solid rgba(106, 13, 173, 0.1);">
                     <div class="form-check form-switch mb-3 custom-switch-premium">
                         <input class="form-check-input" type="checkbox" id="join_community" name="join_community" value="1" checked>
                         <label class="form-check-label ms-2" for="join_community" style="color: var(--mm-text-light); font-weight: 500;">
-                            Souhaitez-vous intégrer la communauté Miss Maths/Miss Sciences de l'IA de Dakar ?
+                            Souhaitez-vous intégrer notre communauté Miss Maths/Miss Sciences ?
                         </label>
                         <div class="form-text mt-2" style="color: var(--mm-text-muted); font-size: 0.8rem; padding-left: 2.5rem;">
                             <i class="bi bi-info-circle me-1"></i> Cela permettra d'avoir l'actualité du concours et les rappels liés.
                         </div>
                     </div>
 
-                    <!-- Section Réseau Social (Affichée si la case est cochée) -->
-                    <div id="section-social" class="dynamic-section" style="padding-left: 2.5rem; display: block;">
-                        <label class="form-label" style="color: var(--mm-accent);">Sur quel réseau social souhaitez-vous avoir les informations liées au concours ?</label>
-                        <div class="custom-select-container" id="social-container">
-                            <div class="select-trigger" id="social-trigger">
-                                <span id="selected-social-text">Choisir un réseau...</span>
-                                <i class="bi bi-chevron-down"></i>
-                            </div>
-                            <div class="select-dropdown" id="social-dropdown">
-                                <div class="select-options" id="social-options">
-                                    <!-- Les options seront générées ici -->
-                                </div>
-                            </div>
-                            <input type="hidden" name="social_network" id="social-hidden-input">
+                    <!-- Section Réseau Social (Icônes centrées) -->
+                    <div id="section-social" class="dynamic-section" style="display: block; text-align: center;">
+                        <label class="form-label" style="color: var(--mm-accent); text-transform: none; font-size: 0.9rem; width: 100%;">Sur quel réseau social souhaitez-vous nous rejoindre ?</label>
+                        <div class="social-icons-row">
+                            <a href="https://chat.whatsapp.com/votre_groupe" target="_blank" class="social-icon-btn" data-social="WhatsApp" title="WhatsApp">
+                                <i class="bi bi-whatsapp"></i>
+                            </a>
+                            <a href="https://t.me/votre_canal" target="_blank" class="social-icon-btn" data-social="Telegram" title="Telegram">
+                                <i class="bi bi-telegram"></i>
+                            </a>
+                            <a href="https://facebook.com/votre_page" target="_blank" class="social-icon-btn" data-social="Facebook" title="Facebook">
+                                <i class="bi bi-facebook"></i>
+                            </a>
+                            <a href="https://instagram.com/votre_compte" target="_blank" class="social-icon-btn" data-social="Instagram" title="Instagram">
+                                <i class="bi bi-instagram"></i>
+                            </a>
+                            <a href="https://tiktok.com/@votre_compte" target="_blank" class="social-icon-btn" data-social="TikTok" title="TikTok">
+                                <i class="bi bi-tiktok"></i>
+                            </a>
                         </div>
+                        <input type="hidden" name="social_network" id="social-hidden-input">
                     </div>
                 </div>
                 
@@ -810,58 +870,20 @@
 
         // Pas besoin de listener sur classSearchInput car supprimé
 
-        // ── Logic for Social Select ──
-        const socialTrigger = document.querySelector('#social-trigger');
-        const socialDropdown = document.querySelector('#social-dropdown');
-        const socialOptionsContainer = document.querySelector('#social-options');
+        // ── Logic for Social Icons ──
+        const socialIcons = document.querySelectorAll('.social-icon-btn');
         const socialHiddenInput = document.querySelector('#social-hidden-input');
-        const selectedSocialText = document.querySelector('#selected-social-text');
 
-        const socialsData = [
-            { name: "WhatsApp", icon: "bi-whatsapp" },
-            { name: "Telegram", icon: "bi-telegram" },
-            { name: "Facebook", icon: "bi-facebook" },
-            { name: "Instagram", icon: "bi-instagram" },
-            { name: "Snapchat", icon: "bi-snapchat" },
-            { name: "LinkedIn", icon: "bi-linkedin" },
-            { name: "TikTok", icon: "bi-tiktok" },
-            { name: "X (Twitter)", icon: "bi-twitter-x" }
-        ];
-
-        function populateSocialOptions() {
-            socialOptionsContainer.innerHTML = '';
-            socialsData.forEach(item => {
-                const option = document.createElement('div');
-                option.className = 'select-option';
-                if (socialHiddenInput.value === item.name) option.classList.add('selected');
-                option.innerHTML = `<i class="bi ${item.icon}"></i><span>${item.name}</span>`;
-                
-                option.addEventListener('click', () => {
-                    socialHiddenInput.value = item.name;
-                    selectedSocialText.textContent = item.name;
-                    selectedSocialText.style.color = 'white';
-                    socialDropdown.style.display = 'none';
-                    socialTrigger.classList.remove('active');
-                });
-                socialOptionsContainer.appendChild(option);
+        socialIcons.forEach(icon => {
+            icon.addEventListener('click', function(e) {
+                // On ne bloque pas le lien (target="_blank" ouvrira le lien)
+                // Mais on sélectionne l'icône pour le formulaire
+                socialIcons.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                socialHiddenInput.value = this.dataset.social;
+                validateForm();
             });
-        }
-
-        socialTrigger.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isOpen = socialDropdown.style.display === 'flex';
-            closeDropdown();
-            closeClassDropdown();
-            if (isOpen) {
-                socialDropdown.style.display = 'none';
-                socialTrigger.classList.remove('active');
-            } else {
-                socialDropdown.style.display = 'flex';
-                socialTrigger.classList.add('active');
-            }
         });
-
-        populateSocialOptions(); // Initial population
         
         // ── Logic for Interest Select ──
         const interestTrigger = document.querySelector('#interest-trigger');
@@ -1003,8 +1025,7 @@
                 sectionSocial.style.display = 'none';
                 socialHiddenInput.removeAttribute('required');
                 socialHiddenInput.value = ''; // Reset selection if unchecked
-                selectedSocialText.textContent = 'Choisir un réseau...';
-                selectedSocialText.style.color = 'var(--mm-text-muted)';
+                socialIcons.forEach(i => i.classList.remove('active'));
             }
         });
 
@@ -1046,10 +1067,10 @@
                 if (!interest || !profession) isValid = false;
             }
 
-            // Réseau social si coché
-            if (joinCommunityCheckbox.checked && !socialHiddenInput.value) {
-                isValid = false;
-            }
+            // Réseau social (Optionnel désormais pour l'activation du bouton)
+            // if (joinCommunityCheckbox.checked && !socialHiddenInput.value) {
+            //     isValid = false;
+            // }
 
             // Bloquer si le quota est atteint
             if (isQuotaFull) {
