@@ -456,6 +456,13 @@
                                 </div>
                             </div>
 
+                            <!-- Bouton pour forcer la saisie manuelle (Apparaît pour le Privé) -->
+                            <div id="manual-entry-toggle" style="display: none; margin-top: 8px;">
+                                <a href="javascript:void(0)" class="text-decoration-none" style="color: var(--mm-accent); font-size: 0.8rem; font-weight: 600;">
+                                    <i class="bi bi-pencil-square me-1"></i>Mon établissement n'est pas listé
+                                </a>
+                            </div>
+
                             <!-- Input libre pour Privé -->
                             <div id="establishment-input-wrapper" style="display: none;">
                                 <input type="text" id="establishment-manual" class="form-control" placeholder="Saisissez le nom de votre établissement">
@@ -479,10 +486,6 @@
                                 </div>
                                 <input type="hidden" name="class" id="class-hidden-input">
                             </div>
-                        </div>
-                        <div class="col-12" id="other-establishment-wrapper" style="display: none;">
-                            <label class="form-label">Précisez l'établissement</label>
-                            <input type="text" name="establishment_other" class="form-control" placeholder="Nom de votre école">
                         </div>
                     </div>
                 </div>
@@ -600,7 +603,7 @@
         };
 
         async function fetchEstablishments(type) {
-            if (type === 'groupe_prive' || type === 'communaute') return;
+            if (type === 'communaute') return;
             
             // Si déjà en cache, on peut optionnellement rafraîchir ou utiliser le cache
             // Pour être "temps réel", on rafraîchit à chaque clic sur le sélecteur ou changement de catégorie
@@ -726,19 +729,55 @@
                         selectedText.textContent = item.name;
                         selectedText.style.color = 'white';
                         
+                        // Si c'est l'option "Autre"
+                        if (item.id === 'other') {
+                            estInputWrapper.style.display = 'block';
+                            estManualInput.focus();
+                        } else {
+                            estInputWrapper.style.display = 'none';
+                            checkQuota(item.name);
+                        }
+                        
                         closeDropdown();
-                        checkQuota(item.name); // Vérifier le quota précisément (sécurité)
                         validateForm();
                     });
                 } else {
                     option.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        // Optionnel : un petit message ou secousse pour indiquer que c'est complet
                     });
                 }
 
                 optionsContainer.appendChild(option);
             });
+
+            // Ajouter l'option "Autre" pour les privés
+            if (category === 'prive' || category === 'groupe_prive') {
+                const otherOption = document.createElement('div');
+                otherOption.className = 'select-option other-option-item';
+                otherOption.innerHTML = `<span><i class="bi bi-plus-circle me-2"></i>${filter ? 'Utiliser "' + filter + '"' : 'Autre (Saisie manuelle)'}</span>`;
+                otherOption.addEventListener('click', () => {
+                    const finalValue = filter || '';
+                    hiddenInput.value = finalValue;
+                    selectedText.textContent = finalValue || 'Autre (Saisie manuelle)';
+                    selectedText.style.color = 'white';
+                    estInputWrapper.style.display = 'block';
+                    estManualInput.value = finalValue;
+                    
+                    if (!finalValue) {
+                        estManualInput.focus();
+                    }
+                    
+                    closeDropdown();
+                    validateForm();
+                });
+                optionsContainer.appendChild(otherOption);
+                
+                // Si on a un filtre et aucun résultat, on cache le message "Aucun résultat" 
+                // car on propose l'option "Utiliser..."
+                if (filtered.length === 0 && filter !== '') {
+                    noResults.style.display = 'none';
+                }
+            }
         }
 
         function toggleDropdown() {
@@ -964,22 +1003,55 @@
             
             // Reset status lors du changement de catégorie
             isQuotaFull = false;
+            
+            const manualToggle = document.querySelector('#manual-entry-toggle');
 
+            // Toujours afficher le wrapper de sélection pour CEM, Lycée et Privé
+            estSelectWrapper.style.display = 'block';
+            estInputWrapper.style.display = 'none';
+            
             if (category === 'groupe_prive') {
-                estSelectWrapper.style.display = 'none';
-                estInputWrapper.style.display = 'block';
-                estManualInput.value = '';
+                labelEstablishment.innerText = 'Établissement Privé';
+                manualToggle.style.display = 'block';
+                fetchEstablishments('prive');
             } else {
-                estSelectWrapper.style.display = 'block';
-                estInputWrapper.style.display = 'none';
-                
-                // UX: Afficher un loader dans le dropdown pendant le fetch
-                optionsContainer.innerHTML = '<div class="p-3 text-center text-muted"><span class="spinner-border spinner-border-sm me-2"></span>Chargement...</div>';
-                
-                fetchEstablishments(category); // Fetch dynamically
+                labelEstablishment.innerText = category === 'cem' ? 'CEM' : 'Lycée';
+                manualToggle.style.display = 'none';
+                fetchEstablishments(category);
             }
+
+            // UX: Afficher un loader dans le dropdown pendant le fetch
+            optionsContainer.innerHTML = '<div class="p-3 text-center text-muted"><span class="spinner-border spinner-border-sm me-2"></span>Chargement...</div>';
+            
             updateClasses(category);
         }
+
+        // Gestion du clic sur le bouton de saisie manuelle
+        document.querySelector('#manual-entry-toggle').addEventListener('click', function() {
+            estSelectWrapper.style.display = 'none';
+            this.style.display = 'none';
+            estInputWrapper.style.display = 'block';
+            estManualInput.value = '';
+            estManualInput.focus();
+            hiddenInput.value = '';
+            
+            // Ajouter un bouton pour revenir à la liste
+            if (!document.querySelector('#back-to-list')) {
+                const backBtn = document.createElement('div');
+                backBtn.id = 'back-to-list';
+                backBtn.style.marginTop = '8px';
+                backBtn.innerHTML = `<a href="javascript:void(0)" class="text-decoration-none" style="color: var(--mm-text-muted); font-size: 0.8rem;">
+                    <i class="bi bi-list-ul me-1"></i>Revenir à la liste
+                </a>`;
+                backBtn.addEventListener('click', function() {
+                    estSelectWrapper.style.display = 'block';
+                    document.querySelector('#manual-entry-toggle').style.display = 'block';
+                    estInputWrapper.style.display = 'none';
+                    this.remove();
+                });
+                estInputWrapper.after(backBtn);
+            }
+        });
 
         // Initial state for 'cem'
         sectionSchool.style.display = 'block';

@@ -41,7 +41,7 @@ class InscriptionController extends BaseController
             'email'          => $email,
             'telephone'      => $telephone,
             'category_id'    => $this->mapCategoryToId($this->request->getPost('type')),
-            'establishment'  => ($this->request->getPost('establishment') === 'Autre') ? trim($this->request->getPost('establishment_other')) : $this->request->getPost('establishment'),
+            'establishment'  => trim($this->request->getPost('establishment')),
             'class'          => $this->request->getPost('class'),
             'profession'     => $this->request->getPost('profession'),
             'interest'       => $this->request->getPost('interest'),
@@ -72,8 +72,8 @@ class InscriptionController extends BaseController
         if ($this->userModel->insert($data)) {
             $this->generateQr($data['code_unique']);
             
-            // Envoi immédiat de l'invitation par email (automatique et optimisé)
-            $this->sendInvitationEmail($data['code_unique']);
+            // L'email sera envoyé en arrière-plan depuis la page ticket (AJAX)
+            // Cela permet d'afficher le ticket instantanément (< 2s au lieu de 30s)
 
             if ($this->request->isAJAX()) {
                 return $this->response->setJSON([
