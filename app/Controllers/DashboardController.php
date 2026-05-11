@@ -48,4 +48,26 @@ class DashboardController extends BaseController
     {
         return view('admin/scanner');
     }
+
+    public function registrationQr()
+    {
+        $url = base_url('/'); // URL de la page d'inscription
+
+        $qrCode = \Endroid\QrCode\QrCode::create($url)
+            ->setEncoding(new \Endroid\QrCode\Encoding\Encoding('UTF-8'))
+            ->setErrorCorrectionLevel(new \Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelLow())
+            ->setSize(400) // Plus grand pour une meilleure qualité
+            ->setMargin(0)
+            ->setRoundBlockSizeMode(new \Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin())
+            ->setForegroundColor(new \Endroid\QrCode\Color\Color(0, 0, 0))
+            ->setBackgroundColor(new \Endroid\QrCode\Color\Color(255, 255, 255));
+
+        $writer = new \Endroid\QrCode\Writer\PngWriter();
+        $result = $writer->write($qrCode);
+
+        // Convertir en base64 pour l'intégrer dans la vue HTML
+        $dataUri = $result->getDataUri();
+
+        return view('public/qr_poster', ['qrImage' => $dataUri, 'url' => $url]);
+    }
 }

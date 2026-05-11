@@ -71,7 +71,7 @@ class EstablishmentSeeder extends Seeder
             ['name' => "CP RASSOUL SCHOOL", 'ief' => 'PARCELLES ASSAINIES', 'quota' => 2, 'type' => 'prive'],
             ['name' => "CP REINE FABIOLA", 'ief' => 'ALMADIES', 'quota' => 2, 'type' => 'prive'],
             ['name' => "CP. SAINT-MAURICE", 'ief' => 'GRAND DAKAR', 'quota' => 2, 'type' => 'prive'],
-            ['name' => "ECOLE PRIVEE MAARIF SACRE CŒUR", 'ief' => 'ALMADIES', 'quota' => 20, 'type' => 'prive'],
+            ['name' => "ECOLE PRIVEE MAARIF SACRE CŒUR", 'ief' => 'ALMADIES', 'quota' => 2, 'type' => 'prive'],
             ['name' => "ECOLE PRIVEE MADIBA MANDELA", 'ief' => 'GRAND DAKAR', 'quota' => 2, 'type' => 'prive'],
             ['name' => "Enko Waca", 'ief' => 'GRAND DAKAR', 'quota' => 2, 'type' => 'prive'],
             ['name' => "ENSUP AFRIQUE/BERKELEY", 'ief' => 'ALMADIES', 'quota' => 20, 'type' => 'prive'],
@@ -100,9 +100,10 @@ class EstablishmentSeeder extends Seeder
             ['name' => "MAISON D'EDUCATION ATHENA", 'ief' => 'DAKAR PLATEAU', 'quota' => 2, 'type' => 'prive'],
             ['name' => "MAISON DE LA SAGESSE", 'ief' => 'DAKAR PLATEAU', 'quota' => 2, 'type' => 'prive'],
             ['name' => "SALDIA", 'ief' => 'GRAND DAKAR', 'quota' => 2, 'type' => 'prive'],
-            ['name' => "CATHEDRALE", 'ief' => 'DAKAR PLATEAU', 'quota' => 100, 'type' => 'prive'],
+            ['name' => "CATHEDRALE", 'ief' => 'DAKAR PLATEAU', 'quota' => 50, 'type' => 'prive'],
             ['name' => "INSTITUTION NOTRE DAME", 'ief' => 'DAKAR PLATEAU', 'quota' => 100, 'type' => 'prive'],
-            ['name' => "COURS PRIVES MAME ABDOU DABAKH", 'ief' => 'ALMADIES', 'quota' => 200, 'type' => 'prive'],
+            ['name' => "COURS PRIVES MAME ABDOU DABAKH", 'ief' => 'ALMADIES', 'quota' => 250, 'type' => 'prive'],
+            ['name' => "COLLEGE SACRE COEUR", 'ief' => 'GRAND DAKAR', 'quota' => 30, 'type' => 'prive'],
 
             // --- SPÉCIAUX (conservés pour la plateforme) ---
             ['name' => "IA", 'quota' => 51, 'type' => 'special', 'ief' => null],

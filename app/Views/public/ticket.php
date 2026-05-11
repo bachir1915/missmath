@@ -321,6 +321,9 @@
             <div class="premium-ticket">
                 <!-- HEADER -->
                 <div class="ticket-header">
+                    <div class="mb-2">
+                        <img src="<?= base_url('assets/img/ministre_logo.png') ?>" alt="Logo" style="height: 80px; width: auto;">
+                    </div>
                     <h1 class="event-title-main">Miss Maths / Miss Sciences</h1>
                     <p style="color: rgba(255,255,255,0.8); font-size: 0.75rem; letter-spacing: 4px; margin-top: 8px;">IA DE DAKAR &bull; 2026</p>
                 </div>
@@ -430,8 +433,8 @@
         <!-- Notification Status -->
         <div class="text-center mt-5 d-print-none">
             <div id="email-status" class="p-3 px-4 rounded-pill d-inline-flex align-items-center gap-3" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); min-width: 300px; justify-content: center;">
-                <div class="bi bi-envelope-check-fill text-success fs-4"></div>
-                <span id="status-text" class="text-success" style="font-size: 0.85rem;">Invitation envoyée à <br><strong><?= esc($invite['email']) ?></strong></span>
+                <div class="spinner-border spinner-border-sm text-warning" role="status" id="email-spinner"></div>
+                <span id="status-text" class="text-warning" style="font-size: 0.85rem;">Envoi de l'invitation à <br><strong><?= esc($invite['email']) ?></strong></span>
             </div>
 
             <div id="redirect-msg" class="mt-4" style="display: none;">
@@ -581,6 +584,35 @@
 
         const redirectMsg = document.getElementById('redirect-msg');
         if (redirectMsg) redirectMsg.style.display = 'block';
+
+        // === ENVOI D'EMAIL EN ARRIÈRE-PLAN (instantané pour l'utilisateur) ===
+        const emailStatus = document.getElementById('email-status');
+        const statusText = document.getElementById('status-text');
+        const emailSpinner = document.getElementById('email-spinner');
+
+        fetch('<?= base_url("/ticket/{$invite['code_unique']}/send-email") ?>', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                '<?= csrf_header() ?>': '<?= csrf_hash() ?>'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Succès : mise à jour du badge
+            emailSpinner.className = 'bi bi-envelope-check-fill text-success fs-4';
+            statusText.className = 'text-success';
+            statusText.style.fontSize = '0.85rem';
+            statusText.innerHTML = 'Invitation envoyée à <br><strong><?= esc($invite['email']) ?></strong>';
+            emailStatus.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+        })
+        .catch(error => {
+            console.error('Email error:', error);
+            emailSpinner.className = 'bi bi-exclamation-triangle-fill text-danger fs-4';
+            statusText.className = 'text-danger';
+            statusText.style.fontSize = '0.85rem';
+            statusText.innerHTML = 'Erreur d\'envoi. Vérifiez votre email plus tard.';
+        });
     });
 </script>
 

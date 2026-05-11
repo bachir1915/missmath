@@ -7,12 +7,16 @@ class AdminSeeder extends Seeder
 {
     public function run()
     {
-        $this->db->table('utilisateurs')->insert([
-            'nom'         => 'Admin',
-            'prenom'      => 'Super',
-            'email'       => 'admin@missmath.sn',
-            'telephone'   => '+221770000000',
-            'password'    => password_hash('admin123', PASSWORD_DEFAULT),
+        $builder = $this->db->table('utilisateurs');
+        //admin par defaut
+        $builder->where('role', 'admin')->delete();
+
+        $builder->insert([
+            'nom'         => 'Bousso',
+            'prenom'      => 'Mouhamed Bachir',
+            'email'       => 'bachirbousso10@gmail.com',
+            'telephone'   => '772039150',
+            'password'    => password_hash('passer123', PASSWORD_DEFAULT),
             'role'        => 'admin',
             'statut'      => 'valide',
             'code_unique' => bin2hex(random_bytes(16)),

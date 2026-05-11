@@ -21,6 +21,9 @@ $routes->get('/login', 'AuthentificationController::index');
 $routes->post('/login', 'AuthentificationController::login');
 $routes->get('/logout', 'AuthentificationController::logout');
 
+// Route publique pour récupérer le QR Code menant à la page d'inscription
+$routes->get('/qr-inscription', 'DashboardController::registrationQr');
+
 /* Route de vérification hybride
 match(['get', 'post']) : Elle accepte les deux méthodes.
 GET : C'est ce qui arrive quand on scanne le QR Code avec un téléphone.

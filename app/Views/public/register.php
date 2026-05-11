@@ -359,6 +359,9 @@
 <div class="row justify-content-center">
     <div class="col-md-8 col-lg-6 fade-in">
         <div class="text-center mb-4">
+            <div class="mb-3 fade-in">
+                <img src="<?= base_url('assets/img/ministre_logo.png') ?>" alt="Logo Ministère" style="height: 120px; width: auto; filter: drop-shadow(0 0 15px rgba(255,255,255,0.1));">
+            </div>
             <div class="brand-title mb-1" style="font-size: 1.8rem;">MISS MATHS/MISS SCIENCES</div>
             <p class="brand-subtitle">IA DE DAKAR &bull; Édition 2026</p>
         </div>
@@ -599,37 +602,70 @@
         let establishmentsCache = {
             cem: [],
             lycee: [],
+            prive: [],
             groupe_prive: []
         };
 
         async function fetchEstablishments(type) {
             if (type === 'communaute') return;
             
-            // Si déjà en cache, on peut optionnellement rafraîchir ou utiliser le cache
-            // Pour être "temps réel", on rafraîchit à chaque clic sur le sélecteur ou changement de catégorie
+            const cacheKey = `mm_cache_est_${type}`;
+            const now = new Date().getTime();
+
+            // Si déjà en mémoire, on peut l'afficher tout de suite (vitesse)
+            if (establishmentsCache[type].length > 0) {
+                const currentCat = selectedTypeInput.value;
+                if (type === currentCat || (type === 'prive' && currentCat === 'groupe_prive')) {
+                    populateOptions(currentCat);
+                }
+            }
+
             try {
                 const response = await fetch(`/get-establishments?type=${type}`, {
                     headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 });
+                
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    throw new Error(errData.message || `Erreur serveur (${response.status})`);
+                }
+
                 const data = await response.json();
                 
-                // Transformer les données pour inclure les headers de zone (IEF)
                 const formatted = [];
                 let currentIef = null;
                 
-                data.forEach(est => {
-                    if (est.ief !== currentIef) {
-                        currentIef = est.ief;
-                        formatted.push({ type: 'zone', name: `IEF : ${currentIef}` });
-                    }
-                    formatted.push(est);
-                });
+                if (Array.isArray(data)) {
+                    data.forEach(est => {
+                        if (est.ief !== currentIef) {
+                            currentIef = est.ief;
+                            formatted.push({ type: 'zone', name: `IEF : ${currentIef}` });
+                        }
+                        formatted.push(est);
+                    });
+                }
                 
                 establishmentsCache[type] = formatted;
-                populateOptions(type);
+                if (type === 'prive') establishmentsCache['groupe_prive'] = formatted;
+                
+                localStorage.setItem(cacheKey, JSON.stringify({
+                    timestamp: now,
+                    data: formatted
+                }));
+
+                // Mise à jour de l'UI seulement si c'est la catégorie active
+                const activeCat = selectedTypeInput.value;
+                if (type === activeCat || (type === 'prive' && activeCat === 'groupe_prive')) {
+                    populateOptions(activeCat);
+                }
             } catch (e) {
-                console.error("Erreur chargement établissements:", e);
-                optionsContainer.innerHTML = '<div class="p-3 text-center text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Erreur de chargement</div>';
+                console.error(`Erreur chargement établissements (${type}):`, e);
+                const activeCat = selectedTypeInput.value;
+                if (type === activeCat || (type === 'prive' && activeCat === 'groupe_prive')) {
+                    if (establishmentsCache[activeCat].length === 0) {
+                        optionsContainer.innerHTML = `<div class="p-3 text-center text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Erreur de chargement<br><small style="font-size: 0.65rem; opacity: 0.7;">${e.message}</small></div>`;
+                    }
+                }
             }
         }
 
@@ -1058,6 +1094,11 @@
         sectionSocial.style.display = 'block';
         labelEstablishment.innerText = 'CEM';
         filterSelects('cem');
+
+        // Pré-chargement de TOUTES les catégories pour que ce soit instantané après
+        fetchEstablishments('cem');
+        fetchEstablishments('lycee');
+        fetchEstablishments('prive');
 
         catItems.forEach(item => {
             item.addEventListener('click', function() {

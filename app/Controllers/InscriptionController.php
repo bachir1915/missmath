@@ -126,11 +126,19 @@ class InscriptionController extends BaseController
             $cid = $email->setAttachmentCID($qrPath);
         }
 
+        // Attacher le Logo Ministère
+        $logoCid = '';
+        $logoPath = FCPATH . 'assets/img/ministre_logo.png';
+        if (file_exists($logoPath)) {
+            $email->attach($logoPath);
+            $logoCid = $email->setAttachmentCID($logoPath);
+        }
+
         // Générer le PDF s'il n'existe pas encore
         if (!file_exists($pdfPath)) {
             try {
                 $options = new Options();
-                $options->set('isRemoteEnabled', false); // Désactivé pour la rapidité
+                $options->set('isRemoteEnabled', false); 
                 $options->set('chroot', FCPATH);
                 $dompdf = new Dompdf($options);
 
@@ -156,9 +164,10 @@ class InscriptionController extends BaseController
         }
 
         $message = view('emails/invitation', [
-            'name' => $name,
-            'link' => $link,
-            'cid'  => $cid
+            'name'    => $name,
+            'link'    => $link,
+            'cid'     => $cid,
+            'logoCid' => $logoCid
         ]);
         $email->setMessage($message);
 
@@ -200,38 +209,88 @@ class InscriptionController extends BaseController
         $cache = \Config\Services::cache();
         $cacheKey = "establishments_list_{$type}";
         
+        // --- AUTO-MIGRATION (Sécurité supplémentaire) ---
+        // On s'assure que les tables existent avant de faire quoi que ce soit
+        try {
+            $migrations = \Config\Services::migrations();
+            $migrations->latest();
+        } catch (\Exception $me) {
+            log_message('error', 'Erreur Auto-Migration: ' . $me->getMessage());
+        }
+
         // Tentative de récupération depuis le cache
-        if ($cachedData = $cache->get($cacheKey)) {
-            return $this->response->setJSON($cachedData);
+        try {
+            if ($cachedData = $cache->get($cacheKey)) {
+                return $this->response->setJSON($cachedData);
+            }
+        } catch (\Exception $e) {
+            // On ignore les erreurs de cache (ex: dossier non writable)
         }
 
-        $estModel = new \App\Models\EstablishmentModel();
-        $establishments = $estModel->where('type', $type)
-                                   ->orderBy('ief', 'ASC')
-                                   ->orderBy('name', 'ASC')
-                                   ->findAll();
+        try {
+            $estModel = new \App\Models\EstablishmentModel();
+            $establishments = $estModel->where('type', $type)
+                                       ->orderBy('ief', 'ASC')
+                                       ->orderBy('name', 'ASC')
+                                       ->findAll();
 
-        $db = \Config\Database::connect();
-        // On récupère les comptes en une seule requête (Optimisation Performance)
-        $counts = $db->table('utilisateurs')
-                     ->select('establishment, COUNT(*) as total')
-                     ->whereIn('establishment', array_column($establishments, 'name'))
-                     ->groupBy('establishment')
-                     ->get()
-                     ->getResultArray();
-        
-        $countMap = array_column($counts, 'total', 'establishment');
+            // --- AUTO-REMPLISSAGE (Self-Healing) ---
+            // Si la table est vide, on la remplit automatiquement
+            if (empty($establishments)) {
+                $seeder = \Config\Database::seeder();
+                try {
+                    $seeder->call('EstablishmentSeeder');
+                    // On relance la recherche après le remplissage
+                    $establishments = $estModel->where('type', $type)
+                                               ->orderBy('ief', 'ASC')
+                                               ->orderBy('name', 'ASC')
+                                               ->findAll();
+                } catch (\Exception $se) {
+                    log_message('error', 'Erreur Auto-Seed: ' . $se->getMessage());
+                }
+            }
 
-        // On calcule les places restantes pour chaque établissement
-        foreach ($establishments as &$est) {
-            $currentCount = $countMap[$est['name']] ?? 0;
-            $est['remaining'] = $est['quota'] - $currentCount;
+            if (empty($establishments)) {
+                return $this->response->setJSON([]);
+            }
+
+            $db = \Config\Database::connect();
+            
+            // On récupère les noms pour le whereIn
+            $names = array_column($establishments, 'name');
+
+            // On récupère les comptes en une seule requête (Optimisation Performance)
+            $counts = $db->table('utilisateurs')
+                         ->select('establishment, COUNT(*) as total')
+                         ->whereIn('establishment', $names)
+                         ->groupBy('establishment')
+                         ->get()
+                         ->getResultArray();
+            
+            $countMap = array_column($counts, 'total', 'establishment');
+
+            // On calcule les places restantes pour chaque établissement
+            foreach ($establishments as &$est) {
+                $currentCount = $countMap[$est['name']] ?? 0;
+                $est['remaining'] = ($est['quota'] ?? 4) - $currentCount;
+            }
+
+            // Mise en cache pour 5 minutes (300 secondes)
+            try {
+                $cache->save($cacheKey, $establishments, 300);
+            } catch (\Exception $e) {
+                // On ignore les erreurs de cache
+            }
+
+            return $this->response->setJSON($establishments);
+
+        } catch (\Exception $e) {
+            log_message('error', 'Erreur getEstablishments: ' . $e->getMessage());
+            return $this->response->setStatusCode(500)->setJSON([
+                'error' => 'Erreur base de données',
+                'message' => $e->getMessage()
+            ]);
         }
-
-        // Mise en cache pour 5 minutes (300 secondes)
-        $cache->save($cacheKey, $establishments, 300);
-
-        return $this->response->setJSON($establishments);
     }
 
     public function sendEmailAjax($code)
@@ -268,14 +327,24 @@ class InscriptionController extends BaseController
      * mkdir: creation du dossier qui va contenir les qr codes
      */
     
+    /**
+     * Logique de generation du QR Code.
+     */
     private function generateQr($code)
     {
         $path = FCPATH . 'uploads/qrcodes/';
+        $fileName = $code . '.png';
+
+        // OPTIMISATION : Si le QR existe déjà, on ne fait rien
+        if (file_exists($path . $fileName)) {
+            return;
+        }
+
         if (!is_dir($path)) {
             mkdir($path, 0777, true);
         }
 
-        // URL publique de scan - accessible par TOUT appareil sans connexion
+        // URL publique de scan
         $url = base_url("/scan?code=$code");
 
         $qrCode = QrCode::create($url)
@@ -284,11 +353,9 @@ class InscriptionController extends BaseController
         
         $writer = new PngWriter();
         $result = $writer->write($qrCode);
-        
-        $fileName = $code . '.png';
         $result->saveToFile($path . $fileName);
 
-        // Mise a jour de la DB avec le chemin de l image pour l affichage du ticket
+        // Mise a jour de la DB uniquement si nécessaire
         $this->userModel->where('code_unique', $code)->set(['qr_path' => $fileName])->update();
     }
 
