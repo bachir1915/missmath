@@ -22,7 +22,7 @@ class InscriptionController extends BaseController
     // page d accueil pour les invites
     public function index()
     {
-        return view('public/register');
+        return view('public/index');
     }
 
    // Traitement du formulaire d inscription 
